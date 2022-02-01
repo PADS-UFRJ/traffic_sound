@@ -1,0 +1,23 @@
+Orientações e diretrizes para serem seguidas no projeto de IC de Análise de Tráfego para Carol e Felipe
+
+  - cada um usar um ramo proprio para ir desenvolvendo o seu codigo e depois que tiver certeza que esta pronto, mesclar no ramo principal (master ou o que for) para ser a versao canonica do codigo
+
+  - mensagens de commit com uma descricao curta de ate 50 char; depois deixar uma linha em branco e fazer uma descricao mais detalhada (ref: https://cbea.ms/git-commit/ )
+
+  - usar o imperativo nas descricoes curtas dos commits (ao inves de "changed this function" usar "change this function")
+
+  - commits atomicos: agregar em um commit apenas o minimo de alteracoes que sejam relacionadas entre si, ou seja, evitar fazer commits com mudancas gigantescas, em diversas partes distintas do codigo
+
+  - sempre fazer pull/fetch antes de dar push no github
+
+  - commits em ingles
+
+  - escrever os nomes das variaveis e funcoes em ingles
+
+  - escrever comentarios em portugues (qlq coisa podemos mudar depois e colocar os comentarios em ingles)
+
+  - nomes de variaveis descritivos sem abreviacao para evitar confusoes (a nao ser em casos especificos)
+
+  - sempre botar descricao da funcao em comentario (entradas, saidas e o que ela faz)
+
+  - sempre comentar o codigo (ex: colocar a descricao da variavel quando ela for inicializada)
