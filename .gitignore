@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+dataset/raw/videos/*
+dataset/raw/audio/*
+dataset/raw/images/*
+
+dataset/preprocessed/inputs/*
+dataset/preprocessed/targets/*
+dataset/preprocessed/features/*
