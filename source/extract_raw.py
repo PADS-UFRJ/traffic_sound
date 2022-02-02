@@ -58,22 +58,22 @@ def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(2
     ## Tratamentos de erro
 
     if not os.path.isfile(video_file):
-        printc('r','[ERROR] ', end='')
+        printc('r','[ERR] ', end='')
         print(f'file not found: {video_file}')
         exit()
 
     if (frames_dir is not None) and (not os.path.isdir(frames_dir)):
-        printc('r','[ERROR] ', end='')
+        printc('r','[ERR] ', end='')
         print(f'directory not found: {frames_dir}')
         exit()
 
     if downsampling_factor <= 0:
-        printc('r','[ERROR] ', end='')
+        printc('r','[ERR] ', end='')
         print(f'downsampling_factor must be a a positive integer, not: ({type(downsamplin_factor)}) {downsampling_factor}')
         exit()
 
     if (image_shape[0] <= 0) or (image_shape[1] <= 0):
-        printc('r','[ERROR] ', end='')
+        printc('r','[ERR] ', end='')
         print(f'image_shape elements must be positive integers, not: {image_shape}')
         exit()
 
