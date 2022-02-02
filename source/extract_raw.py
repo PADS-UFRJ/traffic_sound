@@ -25,7 +25,7 @@ def extract_from_video(video_file, downsampling_factor=30, image_shape=(224,224)
 
 
 
-def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(224,224)):
+def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(224,224), frames_dir=None):
     """
     Extrair frames de um video e salvar no diretorio correspondente do dataset.
 
@@ -59,11 +59,11 @@ def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(2
     video_frame_index = 0 # indice do frame original do video
     downsample_frame_index = 0 # indice do frame ja reamostrado
 
-    # [TODO] colocar opcao de modificar o local em que os frames serao salvos
-    frames_dir = os.path.join(const.IMAGES_DIR, video_name) # diretorio onde iremos salvar os frames
+    if frames_dir is None: # usuario nao forneceu um diretorio
+        frames_dir = os.path.join(const.IMAGES_DIR, video_name) # diretorio onde iremos salvar os frames
 
-    if not os.path.isdir(frames_dir):
-        os.makedirs(frames_dir)
+        if not os.path.isdir(frames_dir):
+            os.makedirs(frames_dir)
 
 
     print('video_name:',video_name)
