@@ -1,6 +1,6 @@
 from os import path
 
-WORK_DIR = path.dirname( path.abspath(__file__) )
+WORK_DIR = path.dirname( path.split(__file__)[0] )
 
 SOURCE_DIR = path.join(WORK_DIR, 'source')
 RESULTS_DIR = path.join(WORK_DIR, 'results')
