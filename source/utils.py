@@ -1,15 +1,15 @@
 from sys import stdout
 
 colors = {
-    'clear' = "\033[39m", # default colors
-	'k' = "\033[30m", # black
-	'r' = "\033[31m", # red
-	'g' = "\033[32m", # green
-	'y' = "\033[33m", # yellow
-	'b' = "\033[34m", # blue
-	'm' = "\033[35m", # magenta
-	'c' = "\033[36m", # cyan
-    'w' = "\033[97m" # white
+    'clear': "\033[39m", # default colors
+	'k': "\033[30m", # black
+	'r': "\033[31m", # red
+	'g': "\033[32m", # green
+	'y': "\033[33m", # yellow
+	'b': "\033[34m", # blue
+	'm': "\033[35m", # magenta
+	'c': "\033[36m", # cyan
+    'w': "\033[97m" # white
 }
 
 def printc(c, s, end='\n', outfile=stdout, flush=False):
