@@ -2,6 +2,7 @@ import const
 import cv2
 import math
 import os
+from utils import printc
 
 def extract_from_video(video_file, downsampling_factor=30, image_shape=(224,224)):
     """
@@ -23,25 +24,60 @@ def extract_from_video(video_file, downsampling_factor=30, image_shape=(224,224)
     extract_images_from_video(video_file, downsampling_factor)
     extract_audio_from_video(video_file, downsampling_factor)
 
+###############################################################
 
 
 def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(224,224), frames_dir=None):
     """
-    Extrair frames de um video e salvar no diretorio correspondente do dataset.
+    Extrair frames de um video e salva-los como arquivos de imagem no diretorio correspondente.
 
-    (Ver estrutura dos diretorios no arquivo folder_structure)
+    (Ver estrutura dos diretorios do dataset no arquivo folder_structure) [TODO]
     ----------------
     video_file (str):
-        arquivo do video fonte
+        Arquivo do video fonte
 
     downsampling_factor (int):
-        fator de reamostragem. Isto eh, se downsampling_factor == X, pegamos 1 frame de video a
+        Fator de reamostragem. Isto eh, se downsampling_factor == X, pegamos 1 frame de video a
         cada X frames.
+
+    image_shape (int list/tuple):
+        O tamanho (em pixels) das imagens salvas. Deve ser uma lista ou tupla de inteiros, com o numero de
+        pixels em cada dimensao da imagem no formato [largura, altura].
+
+    frames_dir (str):
+        O diretorio onde as imagens devem ser salvas. Se nenhum for passado como argumento, as imagens
+        sao salvas no diretorio correspondente do dataset. Caso ele nao exista, sera criado junto com os
+        diretorios pais (se nencessario).
     """
 
-    # [TODO] Verificar se o arquivo video_file existe
     # [TODO] Retirar/melhorar prints
-    #######################################################
+    # [TODO] Substituir exit() por raise() nos tratamentos de erro
+    # [TODO] Implementar verificacoes do tipo dos argumentos passados
+
+    ## -----------------------------------------------------
+    ## Tratamentos de erro
+
+    if not os.path.isfile(video_file):
+        printc('r','[ERROR] ', end='')
+        print(f'file not found: {video_file}')
+        exit()
+
+    if (frames_dir is not None) and (not os.path.isdir(frames_dir)):
+        printc('r','[ERROR] ', end='')
+        print(f'directory not found: {frames_dir}')
+        exit()
+
+    if downsampling_factor <= 0:
+        printc('r','[ERROR] ', end='')
+        print(f'downsampling_factor must be a a positive integer, not: ({type(downsamplin_factor)}) {downsampling_factor}')
+        exit()
+
+    if (image_shape[0] <= 0) or (image_shape[1] <= 0):
+        printc('r','[ERROR] ', end='')
+        print(f'image_shape elements must be positive integers, not: {image_shape}')
+        exit()
+
+    ## -----------------------------------------------------
     ## Inicalizacoes
 
     video_name = os.path.split(video_file)[1] # pegando apenas o nome do arquivo, caso tenha sido fornecido o caminho completo
@@ -73,7 +109,8 @@ def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(2
     print('downsample_total_digits:',downsample_total_digits)
     print('frames_dir:',frames_dir)
 
-    #######################################################
+    ## -----------------------------------------------------
+    ## Principal
 
     ret, frame = video_cap.read()
     while ret:
@@ -97,6 +134,8 @@ def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(2
         video_frame_index += 1
 
     video_cap.release() # ao final, liberar a captura do video
+
+###############################################################
 
 def extract_audio_from_video(video_file, downsampling_factor=30):
     """
