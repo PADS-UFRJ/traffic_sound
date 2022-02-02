@@ -1,5 +1,7 @@
 import const
-from os import path
+import cv2
+import math
+import os
 
 def extract_from_video(video_file, downsampling_factor=30):
     """
