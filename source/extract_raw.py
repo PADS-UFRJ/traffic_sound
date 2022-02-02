@@ -20,6 +20,7 @@ def extract_from_video(video_file, downsampling_factor=30, image_shape=(224,224)
         cada X frames. O numero final de amostras de audio sera igual ao numero de frames que
         pegamos.
     """
+    # [TODO] atualizar descricao e argumentos para incluir argumentos de extract_images_from_video
 
     extract_images_from_video(video_file, downsampling_factor)
     extract_audio_from_video(video_file, downsampling_factor)
