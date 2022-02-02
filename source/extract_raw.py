@@ -28,11 +28,11 @@ def extract_from_video(video_file, downsampling_factor=30, image_shape=(224,224)
 ###############################################################
 
 
-def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(224,224), frames_dir=None):
+def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(224,224), save_dir=None):
     """
     Extrair frames de um video e salva-los como arquivos de imagem no diretorio correspondente.
 
-    (Ver estrutura dos diretorios do dataset no arquivo folder_structure) [TODO]
+    (Ver estrutura dos diretorios do dataset no arquivo const.py)
     ----------------
     video_file (str):
         Arquivo do video fonte
@@ -42,13 +42,13 @@ def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(2
         cada X frames.
 
     image_shape (int list/tuple):
-        O tamanho (em pixels) das imagens salvas. Deve ser uma lista ou tupla de inteiros, com o numero de
-        pixels em cada dimensao da imagem no formato [largura, altura].
+        As dimensoes (em pixels) com as quais salvar as imagens. Deve ser uma lista ou tupla de inteiros
+        positivos, no formato [largura, altura].
 
-    frames_dir (str):
+    save_dir (str):
         O diretorio onde as imagens devem ser salvas. Se nenhum for passado como argumento, as imagens
-        sao salvas no diretorio correspondente do dataset. Caso ele nao exista, sera criado junto com os
-        diretorios pais (se nencessario).
+        sao salvas no diretorio IMAGES_DIR do dataset (ver const.py). Caso IMAGES_DIR nao exista, sera
+        criado (bem como seus diretorios pais, se necessario).
     """
 
     # [TODO] Retirar/melhorar prints
@@ -63,9 +63,9 @@ def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(2
         print(f'file not found: {video_file}')
         exit()
 
-    if (frames_dir is not None) and (not os.path.isdir(frames_dir)):
+    if (save_dir is not None) and (not os.path.isdir(save_dir)):
         printc('r','[ERR] ', end='')
-        print(f'directory not found: {frames_dir}')
+        print(f'directory not found: {save_dir}')
         exit()
 
     if downsampling_factor <= 0:
@@ -96,11 +96,11 @@ def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(2
     video_frame_index = 0 # indice do frame original do video
     downsample_frame_index = 0 # indice do frame ja reamostrado
 
-    if frames_dir is None: # usuario nao forneceu um diretorio
-        frames_dir = os.path.join(const.IMAGES_DIR, video_name) # diretorio onde iremos salvar os frames
+    if save_dir is None: # usuario nao forneceu um diretorio
+        save_dir = os.path.join(const.IMAGES_DIR, video_name) # diretorio onde iremos salvar os frames
 
-        if not os.path.isdir(frames_dir):
-            os.makedirs(frames_dir)
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir)
 
 
     print('video_name:',video_name)
@@ -108,7 +108,7 @@ def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(2
     print('video_total_frames:',video_total_frames)
     print('downsample_total_frames:',downsample_total_frames)
     print('downsample_total_digits:',downsample_total_digits)
-    print('frames_dir:',frames_dir)
+    print('save_dir:',save_dir)
 
     ## -----------------------------------------------------
     ## Principal
@@ -122,7 +122,7 @@ def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(2
             # [REF] Martin Pieters em https://stackoverflow.com/questions/18004646/dynamically-calculated-zero-padding-in-format-string-in-python
             frame_name = video_name + '_frame{number:0{padding}d}.png'.format(number=downsample_frame_index,
                                                                             padding=downsample_total_digits)
-            frame_name = os.path.join(frames_dir, frame_name)
+            frame_name = os.path.join(save_dir, frame_name)
 
             if image_shape is not None:
                 frame = cv2.resize(frame, (image_shape[0], image_shape[1]))
