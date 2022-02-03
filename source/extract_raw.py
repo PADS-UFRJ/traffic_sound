@@ -39,8 +39,9 @@ def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(2
         Arquivo do video fonte
 
     downsampling_factor (int):
-        Fator de reamostragem. Isto eh, se downsampling_factor == X, pegamos 1 frame de video a
-        cada X frames.
+        Fator de reamostragem. Isto eh, se downsampling_factor == X, pegamos 1 frame no inicio de
+        cada intervalo de (no maximo) X frames de video. Com isso, ao final haverao 
+        (total_frames // downsampling_factor) + 1 imagens salvas no diretorio.
 
     image_shape (int list/tuple):
         As dimensoes (em pixels) com as quais salvar as imagens. Deve ser uma lista ou tupla de inteiros
@@ -90,7 +91,7 @@ def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(2
     video_cap = cv2.VideoCapture(video_file)
 
     video_total_frames = int( video_cap.get(cv2.CAP_PROP_FRAME_COUNT) ) # obtendo o total de frames do video a partir da propriedade CAP_PROP_FRAME_COUNT
-    downsample_total_frames = int( video_total_frames / downsampling_factor ) # obtendo o total de frames apos reamostragem
+    downsample_total_frames = int( video_total_frames / downsampling_factor ) + 1 # obtendo o total de frames apos reamostragem
 
     downsample_total_digits = int(math.log10( downsample_total_frames )) + 1 # obtendo o numero de digitos que precisamos para escrever todos os indices de frames apos a reamostragem
 
