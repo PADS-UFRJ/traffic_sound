@@ -3,6 +3,7 @@ import cv2
 import math
 import os
 from utils import printc
+from shutil import which
 
 def extract_from_video(video_file, downsampling_factor=30, image_shape=(224,224)):
     """
@@ -138,21 +139,62 @@ def extract_images_from_video(video_file, downsampling_factor=30, image_shape=(2
 
 ###############################################################
 
-def extract_audio_from_video(video_file, downsampling_factor=30):
+def extract_audio_from_video(video_file, save_dir=None):
     """
-    Extrair array numpy representando audio de um video e salvar no diretorio correspondente do
-    dataset. Mais especificamente, armazenamos o log da potencia do som ao longo de um intervalo
-    determinado pelo fator de reamostragem.
+    Extrair audio de um video e salvar em arquivo wav no diretorio correspondente.
 
-    (Ver estrutura dos diretorios no arquivo folder_structure)
+    (Ver estrutura dos diretorios do dataset no arquivo const.py)
     ----------------
     video_file (str):
-        arquivo do video fonte
+        Arquivo do video fonte
 
-    downsampling_factor (int):
-        fator de reamostragem. Isto eh, se downsampling_factor == X, pegamos 1 frame de video a
-        cada X frames. O numero final de amostras de audio sera igual ao numero de frames que
-        pegamos.
+    save_dir (str):
+        O diretorio onde os arquivos devem ser salvos. Se nenhum for passado como argumento, os audios
+        sao salvos no diretorio AUDIO_DIR do dataset (ver const.py). Caso AUDIO_DIR nao exista, sera
+        criado (bem como seus diretorios pais, se necessario).
     """
 
-    return -1
+    # [TODO] Colocar/melhorar prints
+    # [TODO] Substituir exit() por raise() nos tratamentos de erro
+    # [TODO] Implementar verificacoes do tipo dos argumentos passados
+
+    ## -----------------------------------------------------
+    ## Tratamentos de erro
+
+    if not os.path.isfile(video_file):
+        printc('r','[ERR] ', end='')
+        print(f'file not found: {video_file}')
+        exit()
+
+    if (save_dir is not None) and (not os.path.isdir(save_dir)):
+        printc('r','[ERR] ', end='')
+        print(f'directory not found: {save_dir}')
+        exit()
+
+    if which('ffmpeg') is None:
+        printc('r','[ERR] ', end='')
+        print(f'ffmpeg is not installed. Cant extract audio.')
+        exit()
+
+    ## -----------------------------------------------------
+    ## Inicalizacoes
+
+    video_name = os.path.split(video_file)[1] # pegando apenas o nome do arquivo, caso tenha sido fornecido o caminho completo
+    video_name = video_name.replace(' ', '') # formatando a string para retirar espacos em branco
+    video_name = video_name.replace('.', '') # formatando a string para retirar o ponto da extensao
+
+    if save_dir is None: # usuario nao forneceu um diretorio
+        save_dir = const.AUDIO_DIR # diretorio onde iremos salvar o arquivo de audio
+
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir)
+
+    audio_name = video_name + '_audio.wav'
+    audio_name = os.path.join(save_dir, audio_name)
+
+    ## -----------------------------------------------------
+    ## Principal
+
+    # Daremos um comando usando o programa ffmpeg para extrair o audio do video
+    os_command = "ffmpeg -loglevel quiet -i " + video_file + " " + audio_name
+    os.system(os_command)
