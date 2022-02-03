@@ -135,3 +135,5 @@ dataset/raw/images/*
 dataset/preprocessed/inputs/*
 dataset/preprocessed/targets/*
 dataset/preprocessed/features/*
+
+test.py
