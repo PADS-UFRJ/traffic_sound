@@ -11,6 +11,8 @@ import numpy as np
 import os
 import os.path as pth
 
+import const
+
 
 # [REF] https://pytorch.org/tutorials/beginner/basics/data_tutorial.html
 # [REF] https://pytorch.org/tutorials/beginner/data_loading_tutorial.html
@@ -116,28 +118,11 @@ sys.path.append(pth.abspath('./'))
 ## -----------------------------------------------------
 # Declaracao de constantes
 
-MT_DATASET_DIR = '/home/mathlima/dataset'
+videos_list = const.videos_list
 
-SOURCE_DIR = pth.dirname( pth.abspath(__file__) )
-WORK_DIR = pth.dirname( SOURCE_DIR )
+frames_dirs = [ pth.join(const.MT_DATASET_DIR, v) for v in videos_list ] # lista com os diretorios onde estao os frames de cada video
 
-DATASET_DIR = pth.join(WORK_DIR, 'dataset')
-RAW_DIR = pth.join(DATASET_DIR, 'raw')
-PREPROCESSED_DIR = pth.join(DATASET_DIR, 'preprocessed')
-FEATURES_DIR = pth.join(PREPROCESSED_DIR, 'features')
-TARGETS_DIR = pth.join(PREPROCESSED_DIR, 'targets')
-
-## -----------------------------------------------------
-# Inicializacoes
-
-# videos_list = ['M2U00001MPG']
-videos_list = os.listdir( pth.join(MT_DATASET_DIR, 'raw') )
-videos_list.sort()
-videos_list = [ d.replace('.','') for d in videos_list ] # lista com nomes dos videos
-
-frames_dirs = [ pth.join(MT_DATASET_DIR, v) for v in videos_list ] # lista com os diretorios onde estao os frames de cada video
-
-save_dirs = [ pth.join(FEATURES_DIR, v) for v in videos_list ] # lista com os diretorios onde devemos salvar as features de cada video
+save_dirs = [ pth.join(const.FEATURES_DIR, v) for v in videos_list ] # lista com os diretorios onde devemos salvar as features de cada video
 
 # for d in save_dirs:
 #     if not pth.isdir(d):
@@ -179,7 +164,7 @@ with torch.no_grad(): # destivamos o calculo de gradiente pois nao estamos trein
         print(f'  imgs:{len(dataset)}')
         print(f'  batches: {len(dataloader)}')
         print()
-        print('Calculating outputs')
+        print('Getting batches and calculating their outputs')
 
         for batch_index in range(len(dataloader)): # o numero de batches que serao executados
             # print(f'- batch {batch_index+1}/{len(dataloader)}')
@@ -221,8 +206,7 @@ with torch.no_grad(): # destivamos o calculo de gradiente pois nao estamos trein
             begin = end
 
         filename = f'{videos_list[video_index]}_features.npy'
-        filepath = pth.join(FEATURES_DIR, filename)
-
+        filepath = pth.join(const.FEATURES_DIR, filename)
 
         np.save(filepath, features_array)
 
