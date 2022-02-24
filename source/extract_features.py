@@ -12,67 +12,7 @@ import os
 import os.path as pth
 
 import const
-
-
-# [REF] https://pytorch.org/tutorials/beginner/basics/data_tutorial.html
-# [REF] https://pytorch.org/tutorials/beginner/data_loading_tutorial.html
-
-class FramesDataset(Dataset):
-    # FramesDataset herda a classe Dataset
-
-    def __init__(self, frames_dirs, transform=None):
-
-        ## -----------------------------------------------------
-        ## Tratamentos de erro
-
-        for directory in frames_dirs:
-            if not pth.isdir(directory):
-                raise Exception('Directory not found:',directory)
-
-        ## -----------------------------------------------------
-        ## Inicializações
-
-        self.frames_dirs = frames_dirs # diretorios contendo os frames
-
-        self.transform = transform # a transformacao a ser aplicada nas imagens
-
-        self.frames = [] # lista com o caminho de todos os arquivos de imagem
-
-        for directory in frames_dirs:
-            dir_content = os.listdir(directory) # a lista de todos os arquivos presentes no diretorio
-            dir_content.sort()
-
-            # [REF] https://docs.python.org/3/library/os.path.html#os.path.splitext
-            # [REF] https://www.programiz.com/python-programming/list-comprehension
-            # [TODO] tratar outros formatos de imagem
-            image_files = [ f for f in dir_content if (pth.splitext(f)[1] == '.png') ]
-            image_files = [ pth.join(directory, f) for f in image_files ] # a lista de caminhos completos para os arquivos PNG no diretorio
-
-            self.frames += image_files # adicionamos os arquivos de imagem do diretorio na lista
-
-    ################################################################
-
-    def __getitem__(self, index):
-
-        # img = read_image(self.frames[index])
-        img = cv2.imread(self.frames[index])
-        # print('cv:',type(img))
-        img = transforms.ToPILImage()(img)
-        # print('pil:',type(img))
-
-        if self.transform is not None:
-            img = self.transform(img)
-
-        return img
-
-    ################################################################
-
-    def __len__(self):
-
-        return len(self.frames)
-
-
-################################################################
+from dataset_classes import FramesDataset
 
 
 class VggFeatureExtractor(nn.Module):
