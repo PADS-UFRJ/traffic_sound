@@ -15,8 +15,6 @@ from torchvision import models, transforms
 
 from utils import *
 
-# Definindo a GPU que será usada para a execução do código
-os.environ["CUDA_VISIBLE_DEVICES"] = FEBE_GPU_NUMBER
 
 
 class Traffic_Dataset(Dataset):
@@ -26,15 +24,19 @@ class Traffic_Dataset(Dataset):
     def __init__(self, videos_list):
         '''Define os valores iniciais.'''
         
+    def __len__(self):
+        '''Número total de amostras'''
+        return 1
 
     def __getitem__(self, index):
         '''Retorna o item de número determinado pelo indice''' 
-        self.size_data = index
         
         frames_index = 0
         video_index = 0
         auxiliary = 0
         
+        find_index = False
+
         frames_array = np.array([])
         sound_pressure = np.array([])
 
@@ -45,31 +47,34 @@ class Traffic_Dataset(Dataset):
                     mean=[0.485, 0.456, 0.406],   
                     std=[0.229, 0.224, 0.225])])
 
-        while(frames_index != index):
-            
-            frames_tensor = np.load('dataset/' + videos_list[video_index] + '/imagedata.npy')
-            
-            auxiliary = auxiliary + frames_tensor.shape[0]
+        while(find_index == False):
 
             audio_array =  np.load('dataset/' + videos_list[video_index] + '/audioData.npy')
             audio_array = np.mean(audio_array, axis=1) # Media da posicao 1 
             
-            while (frames_index != auxiliary) and (frames_index != index):
+            try:
+                if video_index > 0:
+                    new_index = index - auxiliary
+                    image = Image.open('dataset/' + videos_list[video_index] + '/'+str(new_index) +'.png')    
+                    pressure = audio_array[new_index]
+                else:
+                    image = Image.open('dataset/' + videos_list[video_index] + '/'+str(index) +'.png')    
+                    pressure = audio_array[index]
 
-                image = Image.open('dataset/' + videos_list[video_index] + '/'+str(frames_index) +'.png')    
-                image_preprocess = preprocess(image)
-                frames_array = np.append(frames_array,image_preprocess)
-
-                sound_pressure = np.append(sound_pressure,audio_array[frames_index])
-                       
-                frames_index+=1            
-            video_index+=1
+            except (FileNotFoundError or IndexError) as error:
+                
+                if index > auxiliary:
+                    frames_tensor = np.load('dataset/' + videos_list[video_index] + '/imagedata.npy')
+                    auxiliary = auxiliary + frames_tensor.shape[0]
+                    video_index+=1
+                find_index = False
+            
+            else:
+                find_index = True    
         
-        frames_array = torch.from_numpy(frames_array).float()
-        frames_array = np.reshape(frames_array,(index,3,224,224))
+        frames_array = preprocess(image)
+        frames_array = np.reshape(frames_array,(1,3,224,224))
+        
 
-        return frames_array,sound_pressure
+        return frames_array,pressure
 
-    def __len__(self):
-        '''Número total de amostras'''
-        return self.size_data 

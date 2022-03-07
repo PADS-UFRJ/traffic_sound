@@ -1,10 +1,4 @@
 # Importando as bibliotecas 
-import numpy as np
-import os
-import torch
-import torchvision
-import torchvision.transforms as transforms
-from torchvision.transforms import ToTensor
 
 import torch
 from torch import optim, nn
@@ -12,8 +6,6 @@ from torchvision import models, transforms
 
 from utils import *
 
-# Definindo a GPU que será usada para a execução do código
-os.environ["CUDA_VISIBLE_DEVICES"] = FEBE_GPU_NUMBER
 
 # Classe que retorna o modelo para a extração de features 
 class FeatureExtractor(nn.Module):

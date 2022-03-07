@@ -1,13 +1,10 @@
 
 # Constantes 
 
-FEBE_GPU_NUMBER = '0'
-BATCH_SIZE = 32
+BATCH_SIZE = 1
 PATH_EXTRACTED_FEATURES = '/home/caroline/Traffic-Pytorch/Data/Preprocessed/'
 EXTRACTION_MODEL = 'vgg16'
 VIDEOS_NUMBER = 38
-TORCH_VERSION = '1.10.0'
-PYTHON_VERSION = '3.7.6'
 
 
 # Lista de vídeos
