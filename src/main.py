@@ -60,7 +60,6 @@ if __name__ == '__main__':
 
   #model.to(device)
 
-
   # Inicializando o novo modelo apenas com as camadas convolucionais
   new_model = FeatureExtractor(model)
   
@@ -84,7 +83,7 @@ if __name__ == '__main__':
     # Carregando o numero de frames que cada video possui 
     frames_tensor = np.load('dataset/' + videos_list[video] + '/imagedata.npy')
     number_frames = frames_tensor.shape[0]
-    
+    #number_frames = 10
 
     print("Numero frames {}".format(number_frames))
 
@@ -93,26 +92,26 @@ if __name__ == '__main__':
 
     print("Inicio ao retorno dos frames e pressoes de cada video\n")
 
-    frames = torch.tensor([])
+    frames_array = np.array([])
+    frames_array_v = np.array([])
     features_array = torch.tensor([])
-    features_inside_verification = torch.tensor([])
     pressure = np.array([])
 
     for index in range(number_frames):
       frame_sample,pressure_sample = dataset[index]  
-      frames = torch.cat([frame_sample, frames], dim=0)
+      frames = frame_sample.detach().numpy()
+      frames_array = np.append(frames_array,frames)
       pressure = np.append(pressure_sample,pressure)
     
-    """
-    pressure = torch.as_tensor(np.array(pressure).astype('float'))
-    pressure.to(device)
-    torch.save(pressure,path +'Labels_'+ videos_list[video]+'.pt')
-    """
-    print("frames.shape {}".format(frames.shape))  
-    
+    print("pressure.shape {}".format(pressure.shape))  
+
+    print("frames array.shape {}".format(frames_array.shape))  
+    frames_array = np.reshape(frames_array,(number_frames,3,224,224)) 
+    frames_array = torch.from_numpy(frames_array).float()
+    print("frames array.shape {}".format(frames_array.shape)) 
     
     # Instanciando o DataLoader
-    dataloader = DataLoader(frames,batch_size = BATCH_SIZE,shuffle=False)
+    dataloader = DataLoader(frames_array,batch_size = BATCH_SIZE,shuffle=False)
     
     # Pegando o tamanho do dataset 
     dataset_size = len(dataset)
@@ -134,57 +133,63 @@ if __name__ == '__main__':
     for batch_index in range(number_frames//BATCH_SIZE):
         
       print("\n------------- Batch {} ----------- \n".format(batch_index))
-
       
       frames = next(dataloader_iter) 
-      #frames = frames.to(device)
-      #frames = frames.to(f'cuda:{new_model.device_ids[0]}')
-      
+      frames=frames.to(device)
+
       print("frames {}".format(frames.device))
       print("Len frames {}".format(len(frames)))
+      frames_index = frames_index + len(frames)
       print("frames shape {}".format(frames.shape))
       
       features = new_model(frames)
-      features = features.to(f'cuda:{new_model.device_ids[0]}')
+      features = features.to('cpu')
       print("Features shape: {}".format(features.shape))
-      #features = features.to(device)
       print("features {}".format(features.device))
-      #features_array = features_array.to(device)
-      features_array = features_array.to(f'cuda:{new_model.device_ids[0]}')
-      features_array = torch.cat([features, features_array], dim=0)
+      features = features.detach().numpy()
+      features_array = np.append(features_array,features)
       
+    print("features arra antes da verificação:{}".format(features_array.shape))
      
+    if (frames_index < number_frames):
+      verification_index = frames_index + 1
+      print("verification_index:{}".format(verification_index))
+
+      # Verificação caso a divisão dos dados em batches não seja inteira.
+      while(verification_index <= number_frames):
+        
+        frame_sample_v,pressure_sample_v = dataset[verification_index]  
+        frames_v = frame_sample_v.detach().numpy()
+        frames_array_v = np.append(frames_array_v,frames_v)
+
+        verification_index+=1
+      
+      frames_array_v = np.reshape(frames_array_v,((number_frames-frames_index),3,224,224)) 
+      frames_array_v = torch.from_numpy(frames_array_v).float()
+
+      features = new_model(frames_array_v)
+      features = features.to('cpu')
+      print("Features shape: {}".format(features.shape))
+      print("features {}".format(features.device))
+      features = features.detach().numpy()
+      features_array = np.append(features_array,features)
+      features_array = np.reshape(features_array,(number_frames,512))
+
     print(features_array.shape)
     
-    verification_index = features_array.shape[0]
+    print("Salvando a matriz de features.\n")
+    np.save(path +'Features_'+ videos_list[video],features_array)
+
+    print("Salvando o vetor com as pressoes sonoras.\n")
+    np.save(path +'Sound-Pressure_'+ videos_list[video],features_array)
     
-    # Verificação caso a divisão dos dados em batches não seja inteira.
-    while(verification_index < number_frames):
-      
-      frames_inside_verification,pressure_inside_verification = dataset[verification_index]
-      #frames_inside_verification = frames_inside_verification.to(device)
-      #frames_inside_verification = frames_inside_verification.to(f'cuda:{new_model.device_ids[0]}')
-
-      #features_inside_verification = features_inside_verification.to(device)
-      features_inside_verification = new_model(frames_inside_verification )
-      features_inside_verification = features_inside_verification.to(f'cuda:{new_model.device_ids[0]}')
-      features_array = torch.cat([features_array,features_inside_verification], dim=0)
-      
-      verification_index+=1
-
-
-    print(features_array.shape)
-    #features_array = features_array.to(f'cuda:{new_model.device_ids[0]}')
-    # Salvando a matriz de features
-    #features_array=features_array.to(device)
-    
-    torch.save(features_array,path +'Features_'+ videos_list[video]+'.pt')
-
+  
     with open(path+'Relatorio_geral.txt',"a") as file_report:
       file_report.write('\nTermino da extracao: {}\n'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
       file_report.write('\nFormato matriz de features: {}\n'.format(features_array.shape))
-    break    
-  
+      file_report.write('\nFormato do vetor de pressões sonoras: {}\n'.format(pressure.shape))
+        
+    
   with open(path+'Relatorio_geral.txt',"a") as file_report:
     file_report.write('\n\nTermino da execução do codigo: {}\n'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
   
