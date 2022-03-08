@@ -54,7 +54,12 @@ feature_extractor = VggFeatureExtractor( vision.models.vgg16(pretrained=True) )
 
 batch_size = 32
 
-device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+gpu = '1'
+
+if not torch.cuda.is_available():
+    raise Exception('GPU not available.')
+
+device = torch.device('cuda:' + gpu)
 
 ## -----------------------------------------------------
 # Corpo principal
