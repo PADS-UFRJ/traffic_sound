@@ -77,7 +77,7 @@ with torch.no_grad(): # destivamos o calculo de gradiente pois nao estamos trein
 
         dataset = FramesDataset([frames_dirs[video_index]], transform=preprocess)
 
-        dataloader = DataLoader(dataset, batch_size=batch_size)
+        dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
         print('## -----------------------------------------------------')
         print(f'dataset: {videos_list[video_index]}')
