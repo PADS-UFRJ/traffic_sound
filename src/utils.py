@@ -1,7 +1,7 @@
 
 # Constantes 
 
-BATCH_SIZE = 1
+BATCH_SIZE = 32
 PATH_EXTRACTED_FEATURES = '/home/caroline/Traffic-Pytorch/Data/Preprocessed/'
 EXTRACTION_MODEL = 'vgg16'
 VIDEOS_NUMBER = 38
