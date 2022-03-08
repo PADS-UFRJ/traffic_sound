@@ -86,10 +86,10 @@ with torch.no_grad(): # destivamos o calculo de gradiente pois nao estamos trein
         print()
         print('Getting batches and calculating their outputs')
 
-        for batch_index in range(len(dataloader)): # o numero de batches que serao executados
-            # print(f'- batch {batch_index+1}/{len(dataloader)}')
+        for batch_index, imgs_batch in enumerate(dataloader): # percorrendo os batches de imagens
 
-            imgs_batch = next(iter(dataloader)) # carregamos o proximo batch de imagens de entrada da rede neural
+            # print(f'- batch {batch_index+1}/{len(dataloader)}')
+            # print(f'--- {imgs_batch.shape} frames')
 
             imgs_batch = imgs_batch.to(device) # carregamos a entrada para a GPU (caso disponivel)
 
