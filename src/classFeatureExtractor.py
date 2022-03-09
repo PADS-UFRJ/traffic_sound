@@ -13,13 +13,13 @@ class FeatureExtractor(nn.Module):
     super(FeatureExtractor, self).__init__()
     self.features = list(model.features)
     self.features = nn.Sequential(*self.features) 
-    self.maxpool = nn.MaxPool2d(kernel_size=7,stride=7,padding=0,dilation=1, ceil_mode = False)
+    self.pooling = model.avgpool 
     self.flatten = nn.Flatten(start_dim=1,end_dim=-1)
 		
   
-  def forward(self, x):
+  def forward(self, x):    
     out = self.features(x)
-    out = self.maxpool(out)
+    out = self.pooling(out)
     out = self.flatten(out)
     
     return out 
