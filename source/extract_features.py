@@ -99,31 +99,14 @@ with torch.no_grad(): # destivamos o calculo de gradiente pois nao estamos trein
 
             features = features.numpy()
 
-            features_list.append(features)
-
-        # features_list[0]: o primeiro batch
-        # features_list[0][0]: as features da primeira imagem do primeiro batch
-        shape = features_list[0][0].shape # o formato de um vetor de features qualquer (no caso da primeira imagem do primeiro batch)
-
-        shape = (len(dataset),) + shape # o formato final da matriz de features (cada elemento eh um vetor de features de uma imagem)
-
-        features_array = np.empty(shape) # inicalizamos o vetor de features vazio
-        # [TODO] verificar se poderiamos usar apenas np.empty(len(dataset))
+            for feat in features:
+                features_list.append(feat)
 
         print('Stacking all outputs in one array')
 
-        begin = 0
-        for i, batch in enumerate(features_list):
-            # [NOTE] o ultimo batch possui o mesmo formato dos outros, ainda que haja menos imagens nele
-            # por isso usamos o slice no batch para pegar apenas as imagens validas
-            if i == len(features_list) - 1:
-                end = len(features_array)
-            else:
-                end = (begin + len(batch))
+        features_array = np.array(features_list)
 
-            features_array[begin:end] = batch[:end-begin]
-
-            begin = end
+        print(f'  shape: {features_array.shape}')
 
         filename = f'{videos_list[video_index]}_features.npy'
         filepath = pth.join(const.FEATURES_DIR, filename)
