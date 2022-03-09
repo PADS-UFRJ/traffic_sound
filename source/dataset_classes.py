@@ -130,6 +130,64 @@ class FeaturesDataset(Dataset):
 
 ################################################################
 
+class AudioTargetDataset(Dataset):
+    # herda a classe Dataset
+
+    def __init__(self, files_list, transform=None):
+
+        ## -----------------------------------------------------
+        ## Tratamentos de erro
+
+        for f in files_list:
+            if not pth.isfile(f):
+                raise Exception('File not found:', f)
+
+        ## -----------------------------------------------------
+        ## Inicializações
+
+        self.files_list = files_list # files_list[v]: caminho do arquivo npy contendo alvos
+
+        self.transform = transform # a transformacao a ser aplicada nos vetores de alvos
+
+        # [NOTE] Estou carregando todos os arrays em um unico grande array na memoria
+        # Uma alternativa seria carregar um array por vez, apenas quando fosse necessario (pode
+        # ser mais lento, mas economizaria memoria)
+
+        self.targets = []
+
+        for targets_file in files_list:
+            targets_array = np.load(targets_file)
+            print(f'{targets_file}\n  {targets_array.shape}')
+            for target in targets_array:
+                self.targets.append(target)
+
+        print(f'targets list len: {len(self.targets)}')
+
+        self.targets = np.array(self.targets)
+
+        print(f'targets array shape: {self.targets.shape}')
+
+
+    ################################################################
+
+    def __getitem__(self, index):
+
+        target = self.targets[index].mean()
+
+        if self.transform is not None:
+            target = self.transform(target)
+
+        return target
+
+    ################################################################
+
+    def __len__(self):
+
+        return len(self.targets)
+
+
+################################################################
+
 ## -----------------------------------------------------
 
 # import sys
@@ -142,8 +200,9 @@ class FeaturesDataset(Dataset):
 
 # videos_list = const.videos_list
 
-# features_files = [ pth.join(const.FEATURES_DIR, v + '_features.npy')  for v in videos_list ]
+# targets_files = [ pth.join(const.MT_DATASET_DIR, v, 'output_targets.npy')  for v in videos_list ]
 
-# dataset = FeaturesDataset(features_files)
+# dataset = AudioTargetDataset(targets_files)
 
 # print(dataset[0].shape)
+# print(dataset[0])
