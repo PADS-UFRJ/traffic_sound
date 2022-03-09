@@ -97,7 +97,7 @@ with torch.no_grad(): # destivamos o calculo de gradiente pois nao estamos trein
 
             features = features.cpu() # passamos o tensor para a CPU para podermos salva-lo em disco como array numpy
 
-            fetaures = features.numpy()
+            features = features.numpy()
 
             features_list.append(features)
 
