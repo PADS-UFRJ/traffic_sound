@@ -1,0 +1,546 @@
+
+******* Extração de features *******
+
+
+Dispositivo usado pelo Pytorch: cpu
+
+Versao biblioteca torch=1.10.0+cu102
+
+Rede convolucional usada:vgg16
+
+Início da execução do codigo: 2022-03-13 14:50:46
+
+-----> Video 0:M2U00001MPG
+
+Numero de frames: 3633
+
+Batch size:32
+
+Inicio da extracao : 2022-03-13 15:26:29
+
+Termino da extracao: 2022-03-13 15:34:55
+
+Formato matriz de features: (3633, 512)
+
+Formato do vetor de pressões sonoras: (3633,)
+
+-----> Video 1:M2U00002MPG
+
+Numero de frames: 3813
+
+Batch size:32
+
+Inicio da extracao : 2022-03-13 16:13:48
+
+Termino da extracao: 2022-03-13 16:22:48
+
+Formato matriz de features: (3813, 512)
+
+Formato do vetor de pressões sonoras: (3813,)
+
+-----> Video 2:M2U00003MPG
+
+Numero de frames: 4061
+
+Batch size:32
+
+Inicio da extracao : 2022-03-13 17:04:01
+
+Termino da extracao: 2022-03-13 17:13:40
+
+Formato matriz de features: (4061, 512)
+
+Formato do vetor de pressões sonoras: (4061,)
+
+-----> Video 3:M2U00004MPG
+
+Numero de frames: 2193
+
+Batch size:32
+
+Inicio da extracao : 2022-03-13 17:24:58
+
+Termino da extracao: 2022-03-13 17:30:14
+
+Formato matriz de features: (2193, 512)
+
+Formato do vetor de pressões sonoras: (2193,)
+
+-----> Video 4:M2U00005MPG
+
+Numero de frames: 3884
+
+Batch size:32
+
+Inicio da extracao : 2022-03-13 18:05:25
+
+Termino da extracao: 2022-03-13 18:14:25
+
+Formato matriz de features: (3884, 512)
+
+Formato do vetor de pressões sonoras: (3884,)
+
+-----> Video 5:M2U00006MPG
+
+Numero de frames: 3810
+
+Batch size:32
+
+Inicio da extracao : 2022-03-13 18:53:26
+
+Termino da extracao: 2022-03-13 19:02:22
+
+Formato matriz de features: (3810, 512)
+
+Formato do vetor de pressões sonoras: (3810,)
+
+-----> Video 6:M2U00007MPG
+
+Numero de frames: 4017
+
+Batch size:32
+
+Inicio da extracao : 2022-03-13 19:40:26
+
+Termino da extracao: 2022-03-13 19:49:56
+
+Formato matriz de features: (4017, 512)
+
+Formato do vetor de pressões sonoras: (4017,)
+
+-----> Video 7:M2U00008MPG
+
+Numero de frames: 3924
+
+Batch size:32
+
+Inicio da extracao : 2022-03-13 20:25:41
+
+Termino da extracao: 2022-03-13 20:34:40
+
+Formato matriz de features: (3924, 512)
+
+Formato do vetor de pressões sonoras: (3924,)
+
+-----> Video 8:M2U00012MPG
+
+Numero de frames: 3641
+
+Batch size:32
+
+Inicio da extracao : 2022-03-13 21:09:07
+
+Termino da extracao: 2022-03-13 21:17:41
+
+Formato matriz de features: (3641, 512)
+
+Formato do vetor de pressões sonoras: (3641,)
+
+-----> Video 9:M2U00014MPG
+
+Numero de frames: 3708
+
+Batch size:32
+
+Inicio da extracao : 2022-03-13 21:52:46
+
+Termino da extracao: 2022-03-13 22:01:25
+
+Formato matriz de features: (3708, 512)
+
+Formato do vetor de pressões sonoras: (3708,)
+
+-----> Video 10:M2U00015MPG
+
+Numero de frames: 4178
+
+Batch size:32
+
+Inicio da extracao : 2022-03-14 07:21:16
+
+Termino da extracao: 2022-03-14 08:03:09
+
+Formato matriz de features: (4178, 512)
+
+Formato do vetor de pressões sonoras: (4178,)
+
+-----> Video 11:M2U00016MPG
+
+Numero de frames: 5474
+
+Batch size:32
+
+Inicio da extracao : 2022-03-14 23:09:46
+
+Termino da extracao: 2022-03-15 00:01:20
+
+Formato matriz de features: (5474, 512)
+
+Formato do vetor de pressões sonoras: (5474,)
+
+-----> Video 12:M2U00017MPG
+
+Numero de frames: 5946
+
+Batch size:32
+
+Inicio da extracao : 2022-03-15 17:13:50
+
+Termino da extracao: 2022-03-15 17:27:51
+
+Formato matriz de features: (5946, 512)
+
+Formato do vetor de pressões sonoras: (5946,)
+
+-----> Video 13:M2U00018MPG
+
+Numero de frames: 4191
+
+Batch size:32
+
+Inicio da extracao : 2022-03-15 19:36:03
+
+Termino da extracao: 2022-03-15 19:45:01
+
+Formato matriz de features: (4191, 512)
+
+Formato do vetor de pressões sonoras: (4191,)
+
+-----> Video 14:M2U00019MPG
+
+Numero de frames: 3875
+
+Batch size:32
+
+Inicio da extracao : 2022-03-15 20:17:45
+
+Termino da extracao: 2022-03-15 20:22:50
+
+Formato matriz de features: (3875, 512)
+
+Formato do vetor de pressões sonoras: (3875,)
+
+-----> Video 15:M2U00022MPG
+
+Numero de frames: 4661
+
+Batch size:32
+
+Inicio da extracao : 2022-03-15 21:10:47
+
+Termino da extracao: 2022-03-15 21:16:54
+
+Formato matriz de features: (4661, 512)
+
+Formato do vetor de pressões sonoras: (4661,)
+
+-----> Video 16:M2U00023MPG
+
+Numero de frames: 5450
+
+Batch size:32
+
+Inicio da extracao : 2022-03-15 22:23:53
+
+Termino da extracao: 2022-03-15 22:31:01
+
+Formato matriz de features: (5450, 512)
+
+Formato do vetor de pressões sonoras: (5450,)
+
+-----> Video 17:M2U00024MPG
+
+Numero de frames: 6864
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 00:17:13
+
+Termino da extracao: 2022-03-16 00:26:10
+
+Formato matriz de features: (6864, 512)
+
+Formato do vetor de pressões sonoras: (6864,)
+
+-----> Video 18:M2U00025MPG
+
+Numero de frames: 5955
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 01:46:16
+
+Termino da extracao: 2022-03-16 01:53:55
+
+Formato matriz de features: (5955, 512)
+
+Formato do vetor de pressões sonoras: (5955,)
+
+-----> Video 19:M2U00026MPG
+
+Numero de frames: 4616
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 02:41:18
+
+Termino da extracao: 2022-03-16 02:47:14
+
+Formato matriz de features: (4616, 512)
+
+Formato do vetor de pressões sonoras: (4616,)
+
+-----> Video 20:M2U00027MPG
+
+Numero de frames: 7061
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 04:40:04
+
+Termino da extracao: 2022-03-16 04:49:18
+
+Formato matriz de features: (7061, 512)
+
+Formato do vetor de pressões sonoras: (7061,)
+
+-----> Video 21:M2U00029MPG
+
+Numero de frames: 5430
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 05:55:36
+
+Termino da extracao: 2022-03-16 06:02:32
+
+Formato matriz de features: (5430, 512)
+
+Formato do vetor de pressões sonoras: (5430,)
+
+-----> Video 22:M2U00030MPG
+
+Numero de frames: 4547
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 06:48:26
+
+Termino da extracao: 2022-03-16 06:54:15
+
+Formato matriz de features: (4547, 512)
+
+Formato do vetor de pressões sonoras: (4547,)
+
+-----> Video 23:M2U00031MPG
+
+Numero de frames: 4337
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 07:35:46
+
+Termino da extracao: 2022-03-16 07:41:25
+
+Formato matriz de features: (4337, 512)
+
+Formato do vetor de pressões sonoras: (4337,)
+
+-----> Video 24:M2U00032MPG
+
+Numero de frames: 4632
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 08:29:17
+
+Termino da extracao: 2022-03-16 08:35:17
+
+Formato matriz de features: (4632, 512)
+
+Formato do vetor de pressões sonoras: (4632,)
+
+-----> Video 25:M2U00033MPG
+
+Numero de frames: 5105
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 09:33:40
+
+Termino da extracao: 2022-03-16 09:40:24
+
+Formato matriz de features: (5105, 512)
+
+Formato do vetor de pressões sonoras: (5105,)
+
+-----> Video 26:M2U00035MPG
+
+Numero de frames: 5222
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 10:41:39
+
+Termino da extracao: 2022-03-16 10:48:18
+
+Formato matriz de features: (5222, 512)
+
+Formato do vetor de pressões sonoras: (5222,)
+
+-----> Video 27:M2U00036MPG
+
+Numero de frames: 3783
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 11:19:13
+
+Termino da extracao: 2022-03-16 11:24:09
+
+Formato matriz de features: (3783, 512)
+
+Formato do vetor de pressões sonoras: (3783,)
+
+-----> Video 28:M2U00037MPG
+
+Numero de frames: 4740
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 12:14:07
+
+Termino da extracao: 2022-03-16 12:20:11
+
+Formato matriz de features: (4740, 512)
+
+Formato do vetor de pressões sonoras: (4740,)
+
+-----> Video 29:M2U00039MPG
+
+Numero de frames: 3647
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 12:48:36
+
+Termino da extracao: 2022-03-16 12:53:25
+
+Formato matriz de features: (3647, 512)
+
+Formato do vetor de pressões sonoras: (3647,)
+
+-----> Video 30:M2U00041MPG
+
+Numero de frames: 5439
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 14:00:10
+
+Termino da extracao: 2022-03-16 14:07:09
+
+Formato matriz de features: (5439, 512)
+
+Formato do vetor de pressões sonoras: (5439,)
+
+-----> Video 31:M2U00042MPG
+
+Numero de frames: 6575
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 15:45:40
+
+Termino da extracao: 2022-03-16 15:54:08
+
+Formato matriz de features: (6575, 512)
+
+Formato do vetor de pressões sonoras: (6575,)
+
+-----> Video 32:M2U00043MPG
+
+Numero de frames: 3938
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 16:28:06
+
+Termino da extracao: 2022-03-16 16:33:14
+
+Formato matriz de features: (3938, 512)
+
+Formato do vetor de pressões sonoras: (3938,)
+
+-----> Video 33:M2U00045MPG
+
+Numero de frames: 4674
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 17:21:55
+
+Termino da extracao: 2022-03-16 17:27:52
+
+Formato matriz de features: (4674, 512)
+
+Formato do vetor de pressões sonoras: (4674,)
+
+-----> Video 34:M2U00046MPG
+
+Numero de frames: 3663
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 17:56:49
+
+Termino da extracao: 2022-03-16 18:01:34
+
+Formato matriz de features: (3663, 512)
+
+Formato do vetor de pressões sonoras: (3663,)
+
+-----> Video 35:M2U00047MPG
+
+Numero de frames: 3618
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 18:29:31
+
+Termino da extracao: 2022-03-16 18:34:08
+
+Formato matriz de features: (3618, 512)
+
+Formato do vetor de pressões sonoras: (3618,)
+
+-----> Video 36:M2U00048MPG
+
+Numero de frames: 5187
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 19:34:43
+
+Termino da extracao: 2022-03-16 19:41:22
+
+Formato matriz de features: (5187, 512)
+
+Formato do vetor de pressões sonoras: (5187,)
+
+-----> Video 37:M2U00050MPG
+
+Numero de frames: 9417
+
+Batch size:32
+
+Inicio da extracao : 2022-03-16 23:05:47
+
+Termino da extracao: 2022-03-16 23:17:47
+
+Formato matriz de features: (9417, 512)
+
+Formato do vetor de pressões sonoras: (9417,)
+
+
+Termino da execução do codigo: 2022-03-16 23:17:47
