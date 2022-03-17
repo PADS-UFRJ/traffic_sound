@@ -13,7 +13,7 @@ class FeatureExtractor(nn.Module):
     super(FeatureExtractor, self).__init__()
     self.features = list(model.features)
     self.features = nn.Sequential(*self.features) 
-    self.pooling = model.avgpool 
+    self.pooling = nn.AdaptiveAvgPool2d(1)
     self.flatten = nn.Flatten(start_dim=1,end_dim=-1)
 		
   
@@ -21,6 +21,5 @@ class FeatureExtractor(nn.Module):
     out = self.features(x)
     out = self.pooling(out)
     out = self.flatten(out)
-    
     return out 
 
