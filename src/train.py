@@ -145,6 +145,15 @@ def test(model,frames_dataloader,pressure_dataloader,loss_function):
                 torch.save(model.state_dict(), 'saved_model.pth')
         return test_loss/len(frames_dataloader)
 
+# Função que retorna o otimizador 
+def optimizer_config(opt,value_lr):
+    if (opt == 'adam'):
+        optimizer = torch.optim.Adam(model.parameters(), lr = value_lr)
+    if (opt == 'adamax'):
+        optimizer = torch.optim.Adamax(model.parameters(), lr = value_lr)
+    if (opt == 'sgd'):
+        optimizer = torch.optim.SGD(model.parameters(), lr = value_lr)
+    return optimizer
 
 # Listas necessárias para a busca por parametros
 epochs = [5]
@@ -208,13 +217,8 @@ if __name__ == '__main__':
             loss_function = nn.MSELoss()
 
 
-            # Otimizadores 
-            if (df['n'][1] == 'adam'):
-                optimizer = torch.optim.Adam(model.parameters(), lr = df['n'][4])
-            if (df['n'][1] == 'adamax'):
-                optimizer = torch.optim.Adamax(model.parameters(), lr = df['n'][4])
-            if (df['n'][1] == 'sgd'):
-                optimizer = torch.optim.SGD(model.parameters(), lr = df['n'][4])
+            # Otimizador 
+            optimizer = optimizer_config(df['n'][1],df['n'][4])
 
             
             loss_min_list = []
