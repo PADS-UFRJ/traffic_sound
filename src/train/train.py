@@ -14,7 +14,7 @@ from torch import nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 
-from utils import *
+#from utils import *
 from Myfolds import *
 
 # Chama a gpu cuda disponível.Caso não tenha gpu disponível , usa a cpu
