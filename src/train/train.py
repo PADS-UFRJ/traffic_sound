@@ -14,27 +14,36 @@ from torch import nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 
-#from utils import *
+from utils import *
 from Myfolds import *
 
 # Chama a gpu cuda disponível.Caso não tenha gpu disponível , usa a cpu
 #device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
 device = 'cpu'
 
+# Arquitetura da rede FC
 class Network(nn.Module):
-    def __init__(self,dropout_value):
-        super(Network,self).__init__()
-        self.fc1 = nn.Linear(512, 128)
-        self.fc2 = nn.Linear(128, 1)
+
+    def __init__(self, input_size, output_size, hidden_layers_size_list,dropout_value):
+        super(Network, self).__init__()
+
+        self.input_size = input_size
+        self.output_size = output_size
+        self.hidden_layers_size_list = hidden_layers_size_list
+        size_current = input_size
+        self.layers = nn.ModuleList()
+        for size_index in hidden_layers_size_list:
+            self.layers.append(nn.Linear(size_current, size_index))
+            size_current = size_index
+        self.layers.append(nn.Linear(size_current, output_size))
         self.dropout = nn.Dropout(dropout_value)
-        
 
     def forward(self, x):
-        x = torch.tanh(self.fc1(x))
+        for layer in self.layers[:-1]: # Estou pegando todas as camadas,exceto a última 
+            x = torch.tanh(layer(x))
         x = self.dropout(x)
-        x = self.fc2(x)
-        
-        return x
+        x = self.layers[-1](x)
+        return x     
 
 # Dataset  que retorna a tupla (frames,pressoes) de 1 fold
 class Folds_Dataset(Dataset):
@@ -208,7 +217,7 @@ if __name__ == '__main__':
             
 
             # Retornando o modelo 
-            model = Network(df['n'][3])
+            model = Network(512,1,[128],df['n'][3])
             print(model)
             model = model.to(device)
             
