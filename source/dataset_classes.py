@@ -8,6 +8,7 @@ import os
 import os.path as pth
 
 import const
+import utils
 
 
 # [REF] https://pytorch.org/tutorials/beginner/basics/data_tutorial.html
@@ -36,7 +37,8 @@ class FramesDataset(Dataset):
 
         for directory in frames_dirs:
             dir_content = os.listdir(directory) # a lista de todos os arquivos presentes no diretorio
-            dir_content.sort()
+            # dir_content.sort()
+            dir_content = utils.sort_nicely(dir_content)
 
             # [REF] https://docs.python.org/3/library/os.path.html#os.path.splitext
             # [REF] https://www.programiz.com/python-programming/list-comprehension
