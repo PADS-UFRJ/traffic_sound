@@ -52,6 +52,7 @@ class FramesDataset(Dataset):
 
         # img = read_image(self.frames[index])
         img = cv2.imread(self.frames[index])
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # print('cv:',type(img))
         img = transforms.ToPILImage()(img)
         # print('pil:',type(img))
