@@ -27,3 +27,29 @@ class VggFeatureExtractor(nn.Module):
     
         return x 
 
+
+# Arquitetura da rede FC
+class FCNetwork(nn.Module):
+
+    def __init__(self, input_size, output_size, hidden_layers_size_list, dropout_value):
+        super().__init__()
+
+        self.input_size = input_size
+        self.output_size = output_size
+        self.hidden_layers_size_list = hidden_layers_size_list
+        size_current = input_size
+        self.layers = nn.ModuleList()
+        for size_index in hidden_layers_size_list:
+            self.layers.append(nn.Linear(size_current, size_index))
+            size_current = size_index
+        self.layers.append(nn.Linear(size_current, output_size))
+        self.dropout = nn.Dropout(dropout_value)
+
+        self.double()
+
+    def forward(self, x):
+        for layer in self.layers[:-1]: # Estou pegando todas as camadas,exceto a última 
+            x = torch.tanh(layer(x))
+        x = self.dropout(x)
+        x = self.layers[-1](x)
+        return x     
