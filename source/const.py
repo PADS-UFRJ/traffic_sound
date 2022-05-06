@@ -8,6 +8,8 @@ SOURCE_DIR = pth.dirname( pth.abspath(__file__) )
 
 WORK_DIR = pth.dirname( SOURCE_DIR )
 
+RESULTS_DIR = pth.join(WORK_DIR, 'results')
+
 DATASET_DIR = pth.join(WORK_DIR, 'dataset')
 RAW_DIR = pth.join(DATASET_DIR, 'raw')
 PREPROCESSED_DIR = pth.join(DATASET_DIR, 'preprocessed')
