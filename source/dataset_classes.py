@@ -106,7 +106,7 @@ class FeaturesDataset(Dataset):
 
         # print(f'features list len: {len(self.features)}')
 
-        self.features = np.array(self.features)
+        self.features = np.array(self.features, dtype=np.float64)
 
         # print(f'features array shape: {self.features.shape}')
 
@@ -141,7 +141,7 @@ class AudioTargetDataset(Dataset):
 
         for f in files_list:
             if not pth.isfile(f):
-                raise Exception('File not found:', f)
+                raise Exception(f'File not found: {f}')
 
         ## -----------------------------------------------------
         ## Inicializações
@@ -158,15 +158,15 @@ class AudioTargetDataset(Dataset):
 
         for targets_file in files_list:
             targets_array = np.load(targets_file)
-            print(f'{targets_file}\n  {targets_array.shape}')
+            # print(f'{targets_file}\n  {targets_array.shape}')
             for target in targets_array:
                 self.targets.append(target)
 
-        print(f'targets list len: {len(self.targets)}')
+        # print(f'targets list len: {len(self.targets)}')
 
         self.targets = np.array(self.targets)
 
-        print(f'targets array shape: {self.targets.shape}')
+        # print(f'targets array shape: {self.targets.shape}')
 
 
     ################################################################
