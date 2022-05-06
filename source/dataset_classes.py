@@ -191,6 +191,96 @@ class AudioTargetDataset(Dataset):
 
 ################################################################
 
+
+class FeaturesAndTargetsUnionDataset(Dataset):
+    # herda a classe Dataset
+
+    def __init__(self, features_dataset, targets_dataset):
+
+        ## -----------------------------------------------------
+        ## Tratamentos de erro
+
+        if len(features_dataset) != len(targets_dataset):
+            text = 'The features and targets must be of the same length.\n'
+            text += f'   -len(features_dataset): {len(features_dataset)}\n'
+            text += f'   -len(targets_dataset): {len(targets_dataset)}'
+            raise Exception(text)
+
+        ## -----------------------------------------------------
+        ## Inicializações
+
+        self.features = features_dataset
+        self.targets = targets_dataset
+
+
+    ################################################################
+
+    def __getitem__(self, index):
+
+        return self.features[index], self.targets[index]
+
+    ################################################################
+
+    def __len__(self):
+
+        return len(self.targets)
+
+
+################################################################
+
+
+# # Dataset  que retorna a tupla (frames,pressoes) de 1 fold
+# class Folds_Dataset(Dataset):
+#     '''Classe que representa nosso dataset. Deve herdar da classe Dataset, em torch.utils.data
+#     '''
+
+#     def __init__(self, folds,mode):
+#         '''Define os valores iniciais.'''
+#         self.m = mode
+        
+#     def __getitem__(self, index): # indice do fold escolhido e modo de treino ou teste
+#         '''Retorna o item de número determinado pelo indice'''
+
+#         frames_list = []
+#         pressures_list = []
+#         list_of_all_frames = []
+#         list_of_all_pressures = []
+
+#         for i in folds[index][self.m]:
+    
+#             training_frames = np.load(path +'Features_'+ i +'.npy')
+            
+#             training_targets = np.load(path +'Sound-Pressures_'+ i +'.npy')
+
+#             frames_list.append(training_frames)
+#             pressures_list.append(training_targets)
+
+#         for i in frames_list:
+#             for j in range(i.shape[0]):
+#                 list_of_all_frames.append(i[j])
+        
+#         for i in pressures_list:
+#             for j in range(i.shape[0]):
+#                 list_of_all_pressures.append(i[j])
+        
+#         frames_array = np.array(list_of_all_frames)
+#         pressures_array = np.array(list_of_all_pressures)
+
+#         frames_array = torch.from_numpy(frames_array).float()
+#         pressures_array = torch.from_numpy(pressures_array).float()
+
+#         # print(f'shape frames in dataset {frames_array.shape}')
+#         # print(f'shape pressure in dataset {pressures_array.shape}')
+
+#         self.data_len = len(list_of_all_frames)
+        
+#         return frames_array,pressures_array
+
+#     def __len__(self):
+#         '''Número total de amostras'''
+#         return self.data_len
+
+
 ## -----------------------------------------------------
 
 # import sys
