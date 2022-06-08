@@ -125,3 +125,46 @@ class FCNetwork(nn.Module):
             x = self.dropout(x)
         x = self.layers[-1](x)
         return x
+
+
+class ModelFromDict(nn.Module):
+    # espera-se que o dicionario seja fruto da leitura de um arquivo JSON algumas chaves sao
+    # inseridas no dicionario antes da declaracao do modelo de acordo com os parametros de treino
+    # p.ex.: dropout da camada FC
+
+    def __init__(self, config_dict):
+        super().__init__()
+
+        self.name = config_dict['name']
+
+        layers_dict = config_dict['layers']
+
+        layers = []
+
+        # percorremos os itens do dicionario e, para cada um, adicionamos a camada correspondente
+        for layer_key in layers_dict:
+            layer = layers_dict[layer_key]
+
+            if (layer_key == 'FeatureExtractor') or (layer_key == 'feature_extractor'):
+                if layer['offline'] == False:
+                    layers.append( VggFeatureExtractor( layer['model'] ) )
+
+            if (layer_key == 'FCNetwork') or (layer_key == 'fc_network'):
+                layers.append(
+                                FCNetwork(
+                                        input_size=layer['input_size'],
+                                        hidden_layers_size_list=layer['hidden_layers'],
+                                        output_size=layer['output_size'],
+                                        dropout_value=layer['dropout_value']
+                                )
+                            )
+
+        self.layers = nn.Sequential(*layers)
+
+    def reset_parameters(self):
+        reset_parameters(self)
+
+    def forward(self, x):
+        # for layer in self.layers:
+        #     x = layer(x)
+        return self.layers(x)
