@@ -3,28 +3,57 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import os
 
+import argparse
+from datetime import datetime
+
 import const
 from folds import folds
 
+# Parseando argumentos
+###############################################################################
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('model')
+parser.add_argument('-d', '--date', default='today')
+parser.add_argument('-f', '--folds', default='all')
+
+args = parser.parse_args()
+
+if args.folds != 'all':
+    try:
+        # foi passado apenas um inteiro como argumento
+        folds = [ folds[ int(args.folds) ] ]
+
+    except:
+        args.folds = args.folds.replace('[', '')
+        args.folds = args.folds.replace(']', '')
+
+        if ':' in args.folds:
+            # foi passado um slice como argumento
+            lim = args.folds.split(':')
+            lim[0] = None if lim[0] == '' else int(lim[0])
+            lim[1] = None if lim[1] == '' else int(lim[1])
+            folds = folds[ lim[0] : lim[1] ]
+
+        elif ',' in args.folds:
+            # foi passada uma lista como argumento
+            args.folds = args.folds.split(',')
+            folds = [ folds[ int(f) ] for f in args.folds ]
+
+        else:
+            raise Exception(f'Unknown folds choice formatting {args.folds}')
+
+if args.date == 'today':
+    date = datetime.now().strftime("%y%m%d")
+else:
+    date = args.date
+
+model = args.model
 
 ###############################################################################
 
-# Cores bonitas para serem usadas no grafico
-# [REF] https://towardsdatascience.com/making-matplotlib-beautiful-by-default-d0d41e3534fd
-
-CB91_Blue   = '#2CBDFE'
-CB91_Green  = '#47DBCD'
-CB91_Pink   = '#F3A0F2'
-CB91_Purple = '#9D2EC5'
-CB91_Violet = '#661D98'
-CB91_Amber  = '#F5B14C'
-
-colors = [CB91_Amber,
-            CB91_Purple,
-            CB91_Green,
-            CB91_Pink,
-            CB91_Blue,
-            CB91_Violet]
+colors = const.colors
 
 ###############################################################################
 
@@ -41,9 +70,12 @@ def get_folds_mean(row, mode):
 
 # Gerando o grafico com a media de todos os folds
 
-model_dir = os.path.join('220505', 'vgg16')
+model_dir = os.path.join(date, model)
 
 const.RESULTS_DIR = os.path.join( const.RESULTS_DIR, model_dir)
+
+if not os.path.isdir(const.RESULTS_DIR):
+    raise Exception(f'Directory not found: {const.RESULTS_DIR}')
 
 history = pd.read_csv( os.path.join(const.RESULTS_DIR, 'history.csv') )
 
@@ -101,12 +133,14 @@ best_losses = []
 best_epochs = []
 avg_times = []
 total_times = []
+index = []
 
 for fold in folds:
     best_losses.append( round( history[ fold['name'] + '_val' ].min(), 3) )
     best_epochs.append( history[ fold['name'] + '_val' ].idxmin() )
     avg_times.append( round(history[ fold['name'] + '_time' ].mean(), 2) )
     total_times.append( round(history[ fold['name'] + '_time' ].sum()) )
+    index.append( fold['index'] )
 
 total_times = [ f'{t//60}:{t%60}' for t in total_times ]
 
@@ -115,6 +149,7 @@ summary['best_val_loss'] = best_losses
 summary['best_epoch'] = best_epochs
 summary['avg_time'] = avg_times
 summary['total_time'] = total_times
+summary.index = index
 summary.index.name = 'fold'
 
 summary.to_csv( os.path.join(const.RESULTS_DIR, 'summary.csv') )
