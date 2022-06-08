@@ -1,5 +1,34 @@
 import torch
 from torch import nn
+import torchvision as vision
+import json
+
+
+def reset_parameters(m):
+    '''
+    Try resetting model weights to avoid
+    weight leakage.
+    '''
+    for layer in m.children():
+        if hasattr(layer, 'reset_parameters'):
+            # print(f'Reset trainable parameters of layer: {layer}')
+            layer.reset_parameters()
+        else:
+            # print(f"Nao possui reset_parameters: {layer}")
+            for sublayer in layer.children():
+                if hasattr(sublayer, 'reset_parameters'):
+                    # print(f'Reset trainable parameters of layer: {sublayer}')
+                    sublayer.reset_parameters()
+                # else:
+                #     print(f"Nao possui reset_parameters: {sublayer}")
+    # for child in m.children():
+    #     for layer in child.children():
+    #         if hasattr(layer, 'reset_parameters'):
+    #             print(f'Reset trainable parameters of layer: {layer}')
+    #             layer.reset_parameters()
+    #         else:
+    #             print(f"Nao possui reset_parameters: {layer}")
+
 
 class VggFeatureExtractor(nn.Module):
 
@@ -11,6 +40,8 @@ class VggFeatureExtractor(nn.Module):
         # self.maxpool = nn.MaxPool2d(kernel_size=7,stride=7,padding=0,dilation=1, ceil_mode = False)
         self.flatten = nn.Flatten(start_dim=1,end_dim=-1)
             
+    def reset_parameters(self):
+        reset_parameters(self)
     
     def forward(self, x):
         x = self.features(x)
@@ -46,6 +77,9 @@ class FCNetwork(nn.Module):
         self.dropout = nn.Dropout(dropout_value)
 
         self.double()
+
+    def reset_parameters(self):
+        reset_parameters(self)
 
     def forward(self, x):
         for layer in self.layers[:-1]: # Estou pegando todas as camadas,exceto a última 
