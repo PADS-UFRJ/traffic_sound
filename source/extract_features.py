@@ -14,6 +14,15 @@ import const
 from dataset_classes import FramesDataset
 from models import VggFeatureExtractor
 
+import argparse
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('extractor')
+parser.add_argument('batch_size')
+parser.add_argument('gpu')
+
+args = parser.parse_args()
 
 ################################################################
 # MAIN
@@ -41,42 +50,21 @@ frames_dirs = [ pth.join(const.MT_DATASET_DIR, v) for v in videos_list ] # lista
 ## -----------------------------------------------------
 # Inicializacoes
 
-batch_size = 32
+batch_size = int(args.batch_size)
 
-gpu = '0'
+gpu = args.gpu
 
 if not torch.cuda.is_available():
     raise Exception('GPU not available.')
 
 device = torch.device('cuda:' + gpu)
 
-MODEL_NAME = 'vgg16' # vgg16, vggNT100, vggNT500
+MODEL_NAME = args.extractor # vgg16, vggNT100, vggNT500
 
 ## -----------------------------------------------------
 # Inicializacoes
 
-vggNT100_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg/barlowtwins_vgg16.pth'
-vggNT500_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg_e500_2/barlowtwins_vgg16.pth'
-
-expected_missing_keys = ['classifier.0.weight', 'classifier.0.bias', 'classifier.3.weight', 'classifier.3.bias', 'classifier.6.weight', 'classifier.6.bias']
-
-if MODEL_NAME == 'vgg16':
-    vgg = vision.models.vgg16(pretrained=True).cuda('cuda:'+gpu)
-else:
-    if MODEL_NAME == 'vggNT100':
-        pretrained_model_file = vggNT100_model_file
-    elif MODEL_NAME == 'vggNT500':
-        pretrained_model_file = vggNT500_model_file
-    else:
-        raise Exception(f'Unknown model chosen: {MODEL_NAME}')
-
-    # inicializando modelo
-    vgg = vision.models.vgg16(pretrained=False).cuda('cuda:'+gpu)
-    # carregando pesos do disco
-    state_dict = torch.load(pretrained_model_file, map_location='cpu')
-    # inicializando os pesos do modelo com os pesos carregados do disco
-    missing_keys, unexpected_keys = vgg.load_state_dict(state_dict, strict=False)
-    assert missing_keys == expected_missing_keys and unexpected_keys == []
+vgg = MODEL_NAME
 
 feature_extractor = VggFeatureExtractor( vgg )
 
