@@ -152,4 +152,4 @@ summary['total_time'] = total_times
 summary.index = index
 summary.index.name = 'fold'
 
-summary.to_csv( os.path.join(const.RESULTS_DIR, 'summary.csv') )
+summary.to_csv( os.path.join(const.RESULTS_DIR, 'summary.csv'), sep=';', decimal=',' )
