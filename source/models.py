@@ -51,6 +51,9 @@ class VggFeatureExtractor(nn.Module):
             elif vgg == 'vggNT6k_subset50':
                 self.name = 'vggNT6k_subset50_feat_xtr' if name is None else name
                 pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg_queue_192_e6000_subset_50_20220609/barlowtwins_vgg16.pth'
+            elif vgg == 'vggNT12k_subset25':
+                self.name = 'vggNT12k_subset25_feat_xtr' if name is None else name
+                pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg_queue_192_e12000_subset_25_20220627/barlowtwins_vgg16.pth'
             else:
                 raise Exception(f'Unknown model chosen: {vgg}')
 
