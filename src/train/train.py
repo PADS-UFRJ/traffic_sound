@@ -1,3 +1,4 @@
+from distutils.log import error
 import numpy as np
 import os
 import pandas as pd
@@ -7,7 +8,8 @@ import sqlite3
 import time
 from datetime import datetime
 import matplotlib.pyplot as plt
-from sklearn import datasets
+from scipy import stats
+from scipy.stats import pearsonr
 
 import torch
 from torch import nn
@@ -16,208 +18,172 @@ from torch.utils.data import DataLoader, Dataset
 
 from utils import *
 from Myfolds import *
+from functions import *
 
 # Chama a gpu cuda disponível.Caso não tenha gpu disponível , usa a cpu
-#device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
-device = 'cpu'
-
-# Arquitetura da rede FC
-class Network(nn.Module):
-
-    def __init__(self, input_size, output_size, hidden_layers_size_list,dropout_value):
-        super(Network, self).__init__()
-
-        self.input_size = input_size
-        self.output_size = output_size
-        self.hidden_layers_size_list = hidden_layers_size_list
-        size_current = input_size
-        self.layers = nn.ModuleList()
-        for size_index in hidden_layers_size_list:
-            self.layers.append(nn.Linear(size_current, size_index))
-            size_current = size_index
-        self.layers.append(nn.Linear(size_current, output_size))
-        self.dropout = nn.Dropout(dropout_value)
-
-    def forward(self, x):
-        for layer in self.layers[:-1]: # Estou pegando todas as camadas,exceto a última 
-            x = torch.tanh(layer(x))
-        x = self.dropout(x)
-        x = self.layers[-1](x)
-        return x     
-
-# Dataset  que retorna a tupla (frames,pressoes) de 1 fold
-class Folds_Dataset(Dataset):
-    '''Classe que representa nosso dataset. Deve herdar da classe Dataset, em torch.utils.data
-    '''
-
-    def __init__(self, folds,mode):
-        '''Define os valores iniciais.'''
-        self.m = mode
-        
-    def __getitem__(self, index): # indice do fold escolhido e modo de treino ou teste
-        '''Retorna o item de número determinado pelo indice'''
-
-        frames_list = []
-        pressures_list = []
-        list_of_all_frames = []
-        list_of_all_pressures = []
-
-        for i in folds[index][self.m]:
-    
-            training_frames = np.load(path +'Features_'+ i +'.npy')
-            
-            training_targets = np.load(path +'Sound-Pressures_'+ i +'.npy')
-
-            frames_list.append(training_frames)
-            pressures_list.append(training_targets)
-
-        for i in frames_list:
-            for j in range(i.shape[0]):
-                list_of_all_frames.append(i[j])
-        
-        for i in pressures_list:
-            for j in range(i.shape[0]):
-                list_of_all_pressures.append(i[j])
-        
-        frames_array = np.array(list_of_all_frames)
-        pressures_array = np.array(list_of_all_pressures)
-
-        frames_array = torch.from_numpy(frames_array).float()
-        pressures_array = torch.from_numpy(pressures_array).float()
-
-        print(f'shape frames in dataset {frames_array.shape}')
-        print(f'shape pressure in dataset {pressures_array.shape}')
-
-        self.data_len = len(list_of_all_frames)
-        
-        return frames_array,pressures_array
-
-    def __len__(self):
-        '''Número total de amostras'''
-        return self.data_len
-
-# Função de treino 
-def train(model,frames_dataloader,pressure_dataloader,loss_function,optimizer):
-    model.train()
-    train_loss = 0.0
-    for frames,pressure in zip(frames_dataloader,pressure_dataloader):
-            
-        frames, pressure = frames.to(device), pressure.to(device)
-        
-        pressure_aux = pressure 
-        pressure = pressure_aux[:,None]
-        
-        # Passando os dados para o modelo para obter as predições
-        pred = model(frames)
-
-        # Calculando a perda através da função de perda
-        loss = loss_function(pred,pressure)
-
-        # Zerando os gradientes acumulados.O Pytorch vai acumulando os gradientes de acordo com as operações realizadas .  
-        optimizer.zero_grad()
-
-        # Calculando os gradientes
-        loss.backward()
-
-        # Tendo o gradiente já calculado , o step indica a direção que reduz o erro que vamos andar 
-        optimizer.step()
-
-        # Loss é um tensor!
-        train_loss += loss.item()
-    return train_loss/len(frames_dataloader)
-    
-# Função de teste 
-def test(model,frames_dataloader,pressure_dataloader,loss_function):
-    model.eval()
-    test_loss = 0.0
-    min_test_loss = np.inf
-    with torch.no_grad():
-        for frames,pressure in zip(frames_dataloader,pressure_dataloader):
-            
-            frames, pressure = frames.to(device), pressure.to(device)
-            
-            pressure_aux = pressure 
-            pressure = pressure_aux[:,None]
-            
-            # Passando os dados para o modelo para obter as predições
-            pred = model(frames)
-
-            # Calculando a perda através da função de perda
-            loss = loss_function(pred,pressure)
-
-            test_loss += loss.item()
-            if min_test_loss > test_loss:
-                #print(f'Validation Loss Decreased({min_test_loss:.6f}--->{test_loss:.6f}) \t Saving The Model')
-                min_test_loss = test_loss
-        
-                # Salvando o modelo 
-                torch.save(model.state_dict(), 'saved_model.pth')
-        return test_loss/len(frames_dataloader)
-
-# Função que retorna o otimizador 
-def optimizer_config(opt,value_lr):
-    if (opt == 'adam'):
-        optimizer = torch.optim.Adam(model.parameters(), lr = value_lr)
-    if (opt == 'adamax'):
-        optimizer = torch.optim.Adamax(model.parameters(), lr = value_lr)
-    if (opt == 'sgd'):
-        optimizer = torch.optim.SGD(model.parameters(), lr = value_lr)
-    return optimizer
-
-# Listas necessárias para a busca por parametros
-epochs = [5]
-opt = ['sgd']
-batch = [32]
-dropout = [0.2] # dropout 0 não dá certo !
-lr = [1e-5]
+device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
 
 
 if __name__ == '__main__':
 
-    path = PATH_EXTRACTED_FEATURES+ EXTRACTION_MODEL+'/'
+    if(LSTM == True):
+        permutation = list(itertools.product(epochs,opt,batch,dropout,lr,dropout_lstm))
+    else:
+        permutation = list(itertools.product(epochs,opt,batch,dropout,lr))
+    
+    #time_file = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    time_file = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
-    permutation = list(itertools.product(epochs,opt,batch,dropout,lr))
+    file_name = 'Training_report-'+ time_file     
 
-    for i in range(len(permutation)):
-        df = pd.DataFrame(list(zip(permutation[i])), columns = ['n'])
+    train_list = pd.DataFrame()
+    val_list = pd.DataFrame()
+
+    for permutation_index in range(len(permutation)):
+        df = pd.DataFrame(list(zip(permutation[permutation_index])),columns = ['hyperparameters'])
+        
+        epochs_grid = df['hyperparameters'][0]
+        optmizer_grid = df['hyperparameters'][1]
+        batch_grid = df['hyperparameters'][2]
+        dropout_grid = df['hyperparameters'][3]
+        lr_grid = df['hyperparameters'][4]
+        if(LSTM == True):
+            dropout_lstm_grid = float(df['hyperparameters'][5])
+            print(type(dropout_lstm_grid))
+        
+        training_results_path = os.path.join("results/",time_file+"/Grid_"+str(permutation_index)+"/")
+        
+        if not os.path.exists(training_results_path):
+            os.makedirs(training_results_path)
+        
+        save_current_version_os_codes(time_file)
+        
+        file_path = training_results_path+file_name+"-Grid_"+str(permutation_index)+'.txt'
+
+        history_file = open(file_path,'w+')
+        history_file.write('\nDispositivo usado pelo Pytorch: {}\n'.format(device))
+        history_file.write('\nFeatures usadas: {}\n'.format(FEATURES))
+        history_file.close()
+
+        history_file = open(file_path,'a')
+        history_file.write('\n*****************************************\n')
+        history_file.write('\n-----> GRID {}: {}\n'.format(permutation_index,df))
+        history_file.close()
+            
 
         # Setando a seed do pytorch e do numpy !
         torch.manual_seed(22)
         np.random.seed(22)
 
-    
-        # Loop de treino para os 10 folds
+        if(LSTM == True):
+            history_file = open(file_path,'a')
+            history_file.write('\n LSTM ={}\n\n'.format(LSTM))
+            history_file.write('\n option_overlap={} , option_causal={} ,option_dropout_lstm={}\n\n'.format(option_overlap,option_causal,dropout_lstm_grid))
+            history_file.close()
+
+        # Loop de treino e validação para os 10 folds
         for fold_index in range(folds_number):
             print(f'----> Fold {fold_index}')
             
+            history_file = open(file_path,'a')
+            history_file.write('\n\n--> Fold: {}\n'.format(fold_index))
+            history_file.close()
 
             # Dados de treino 
-            dataset = Folds_Dataset(folds,mode='train') # passamos o dicionário de folds 
-                                                        # e o modo que queremos : 'train'
 
-            train_data = dataset[fold_index] # indice do fold escolhido
+            if(LSTM == True):
+                print("train dataset lstm")
+                train_dataset = LSTM_Dataset(folds,         # passamos o dicionário de folds
+                                             fold_index,     # o indice do fold
+                                             'train',        # o modo que queremos : 'train'
+                                             option_overlap, # se tem sobreposição de janelas ou não
+                                             option_causal,  # se é causal ou não
+                                             size_windows)   # o tamanho da janela                                                                                                                                                                                                                                                    
+
+            else:
+                print("train dataset vgg")
+                train_dataset = VGG_Dataset(folds,          # passamos o dicionário de folds
+                                            fold_index,     # e o indice do fold 
+                                            mode='train')   # e o modo que queremos : 'train'
+                                                                            
+                                                                            
             
-            print(f'shape of train frames: {train_data[0].shape}')
-            print(f'shape of train pressures:{train_data[1].shape}')
-        
-            train_frames_loader = DataLoader(train_data[0],batch_size = df['n'][2],shuffle=True )
-            train_pressure_loader = DataLoader(train_data[1],batch_size = df['n'][2],shuffle=True )
-
-
-            # Dados de teste
-            dataset = Folds_Dataset(folds,mode='test') # passamos o dicionário de folds 
-                                                       # e o modo que queremos : 'test'
-            test_data = dataset[fold_index]
-
-            print(f'shape of test frames: {test_data[0].shape}')
-            print(f'shape of test pressures:{test_data[1].shape}')
-
-            test_frames_loader = DataLoader(test_data[0],batch_size = df['n'][2],shuffle=True )
-            test_pressure_loader = DataLoader(test_data[1],batch_size = df['n'][2],shuffle=True )
+            train_frames_array = [] # é uma lista com as features(vetor) 
+            train_frames_tensor = [] # usado apanas na lstm ,é um lista com as janelas
+            train_pressures_array = []
+            val_frames_array = []
+            val_pressures_array = []
+             
             
+            len_train = len(train_dataset)
+            # teste do dia 200722
+            #train_loader = DataLoader(train_dataset,batch_size = batch_grid,shuffle=True,num_workers=3)#,collate_fn=collate_fn)
+            
+            print(f' len train {len_train}')
+            
+            
+            for index in range(len_train):
+                train_frame,train_pressure = train_dataset[index]
+                
+                if(LSTM == True) and (option_causal == False):
+                    train_frames_array.append(train_frame[size_windows//2 - 1])
+                    train_frames_tensor.append(train_frame)
+
+                elif(LSTM == True) and (option_causal == True):
+                    train_frames_array.append(train_frame[size_windows - 1])
+                    train_frames_tensor.append(train_frame)
+                else: # vgg !
+                    train_frames_array.append(train_frame)
+                
+                train_pressures_array.append(train_pressure)
+                
+            # Dados de validação
+            if(LSTM == True):
+                print("val dataset lstm")
+                val_dataset = LSTM_Dataset( folds,         # passamos o dicionário de folds
+                                            fold_index,     # o indice do fold
+                                            'val',          # o modo que queremos : 'val'
+                                            option_overlap, # se tem sobreposição de janelas ou não
+                                            option_causal,  # se é causal ou não
+                                            size_windows)   # o tamanho da janela                                                                                                                                                                                                                                                    
+            else:
+                print("val dataset vgg")
+                val_dataset = VGG_Dataset(folds,        # passamos o dicionário de folds
+                                          fold_index,   # e o indice do fold 
+                                          mode='val')   # e o modo que queremos : 'val'  
+                    
+
+            len_val = len(val_dataset)
+            # teste do dia 200722
+            #test_loader = DataLoader(val_dataset,batch_size = batch_grid,shuffle=True,num_workers=3)
+            
+            for index in range(len_val):
+                val_frame,val_pressure = val_dataset[index] 
+
+                if(LSTM == True) and (option_causal == False):
+                    val_frames_array.append(val_frame[size_windows//2 - 1])
+
+                elif(LSTM == True) and (option_causal == True):
+                    val_frames_array.append(val_frame[size_windows - 1])
+                
+                else:
+                    val_frames_array.append(val_frame)
+                
+                val_pressures_array.append(val_pressure)
+            
+            
+            history_file = open(file_path,'a')
+            history_file.write('\nFormat of train data: frames: {} , pressures: {} \n'.format(len(train_frames_array),len(train_pressures_array)))
+            history_file.write('\nFormat of validation data: frames: {} , pressures: {} \n'.format(len(val_frames_array),len(val_pressures_array)))
+            history_file.write('\nOption shuffle: {}\n'.format(OPTION_SHUFFLE))
+            history_file.close()
 
             # Retornando o modelo 
-            model = Network(512,1,[128],df['n'][3])
+            if(LSTM == True):
+                model = LSTM_Network(INPUT_SIZE_FEATURES,OUTPUT_SIZE_FEATURES,HIDDEN_SIZE,dropout_grid,num_layers,dropout_lstm_grid,bidirectional) 
+            else:
+                model = VGG_Network(INPUT_SIZE_FEATURES,OUTPUT_SIZE_FEATURES,[128],dropout_grid)
+            
             print(model)
             model = model.to(device)
             
@@ -227,36 +193,273 @@ if __name__ == '__main__':
 
 
             # Otimizador 
-            optimizer = optimizer_config(df['n'][1],df['n'][4])
+            optimizer = optimizer_config(optmizer_grid,model,lr_grid)
+            
+            #last_epoch = False
+            list_loss_train = []
+            list_loss_val = []
+            list_predictions = []
+            list_of_all_predictions = []
+            #predictions = []
+            #pressures = []
+            min_val_loss = np.inf
 
-            
-            loss_min_list = []
-            loss_min_test = []
-            
-            
-            for epochs_index in range(df['n'][0]):
-                begin = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            begin = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 
-                train_loss = train(model,train_frames_loader,train_pressure_loader,loss_function,optimizer)
+            history_file = open(file_path,'a')
+            history_file.write('\nBegin of training: {}'.format(begin))
+            history_file.write('\n\nEpoch,train_loss,val_loss,lr')
+            history_file.close()
+
+
+            for epochs_index in range(epochs_grid):
+
+                train_loss = train(model,train_dataset,loss_function,optimizer,batch_grid)
+                ##train_loss = train(model,train_loader,loss_function,optimizer) #teste do dia 200722
+                val_loss = validation(model,val_dataset,loss_function,training_results_path,fold_index,batch_grid)
+                ##val_loss = test(model,test_loader,loss_function,training_results_path,fold_index) #teste do dia 200722
                 
-                end = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                if min_val_loss > val_loss:
+                    min_val_loss = val_loss
+                    epoch_of_min_val_loss = epochs_index+1
 
-                loss_min_list.append(train_loss)
+                history_file = open(file_path,'a')    
+                history_file.write('\n{},{},{},{}'.format(epochs_index+1,train_loss,val_loss,lr_grid))
+                history_file.close()
 
-                test_loss = test(model,test_frames_loader,test_pressure_loader,loss_function)
+                list_loss_train.append(train_loss)
+                list_loss_val.append(val_loss)
+
+                print(f'Epoch: {epochs_index+1}\t Training Loss: {train_loss} \t Val Loss: {val_loss}')
+    
+            end = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            # Curva de treino 
+            df_train = pd.DataFrame(list_loss_train, columns = ['train_loss'])
+            train_loss_min = df_train['train_loss'].values.min()
+
+            df_val = pd.DataFrame(list_loss_val, columns = ['val_loss'])
+            val_loss_min = df_val['val_loss'].values.min()
+
+            training_files_path = os.path.join(training_results_path,'files_training/')
                 
-                loss_min_test.append(test_loss)
+            if not os.path.exists(training_files_path):
+                os.makedirs(training_files_path)
 
-                print(f'Epoch: {epochs_index+1}\t Training Loss: {train_loss} \t Test Loss: {test_loss}')
+            df_train.to_csv(training_files_path+"train_loss_fold_"+str(fold_index)+".csv", columns = ['train_loss'])
+            df_val.to_csv(training_files_path+"val_loss_fold_"+str(fold_index)+".csv", columns = ['val_loss'])
 
-              
+            graphic_of_training(df_train,df_val,fold_index,training_files_path,epochs_grid)
+        
+            history_file = open(file_path,'a')
+            history_file.write('\nEnd of training: {}\n'.format(end))
+            history_file.write('\nLoss min training: {}\n'.format(train_loss_min))
+            history_file.write('\nLoss min val: {}\n'.format(val_loss_min))
+            history_file.write('\nBest epoch: {}\n'.format(epoch_of_min_val_loss))
+            history_file.close()  
+
+            """
+            # Gráfico de predição
+            list_of_all_pressures = []
             
-            df1 = pd.DataFrame(loss_min_list, columns = ['train_loss'])
-            loss_min = df1['train_loss'].values.min()
 
-            plt.plot(loss_min_list)
-            plt.plot(loss_min_test)
-            plt.savefig('loss.png')
+            print(f'len predictions {len(predictions)}')
+            for i in predictions:
+                for j in range(i.shape[0]):
+                    list_of_all_predictions.append(i[j])
+            print(f'len list all predictions {len(list_of_all_predictions)}')
+            
+            
+            list_of_all_predictions = np.array(list_of_all_predictions,dtype= 'float64')
+            list_of_all_predictions = np.squeeze(list_of_all_predictions)
+
+            for i in pressures:
+                for j in range(i.shape[0]):
+                    list_of_all_pressures.append(i[j])
+            
+            
+            pressure_npy = np.array(list_of_all_pressures,dtype= 'float64')
+            pressure_npy = np.squeeze(pressure_npy)
+            
+
+            # Calculando a correlação
+
+            correlation = pearsonr(pressure_npy,list_of_all_predictions)
+            
+            history_file = open(file_path,'a')
+            history_file.write('\nCorrelação: {}\n\n\n'.format(correlation))
+            history_file.close()
+
+            # Plotando gráfcos de predições pelo modelo carregado 
+            list_predictions = []
+            """
+            try: 
+                
+                #last_epoch_model_path = os.path.join(training_results_path,'last_epoch_model/'+'model_last_epoch_fold_'+str(fold_index)+'.pth')
+                best_epoch_model_path = os.path.join(training_results_path,'best_model/'+'best_model_fold_'+str(fold_index)+'.pth')
+                model.load_state_dict(torch.load(best_epoch_model_path))
+                model.to(device)
+                model.eval()
+                    
+            except: 
+                print('Erro em abrir arquivo!')
+            else:
+                list_predictions = []
+                pred_loader = DataLoader(val_dataset,batch_size=batch_grid,shuffle=False,num_workers=OPTION_NUM_WORKERS)
+                with torch.no_grad():
+                    for frames,pressure in pred_loader:        
+                        frames= frames.to(device)
+                        #print(frames.shape)
+                        
+                        # Passando os dados para o modelo para obter as predições
+                        pred = model(frames)
+                        list_predictions.append(pred)
+                    """
+                # Plotando o gráfico de predição para cada video dentro de 1 fold
+                #begin_index = 0
+                #auxiliary = 0
+                #training_frames_m = np.load(path_matheus+'fold_'+ str(fold_index)+'_train_input_data_gap.npy')
+                #print(type(training_frames_m))
+                for video_index in folds[fold_index]['train']:
+                    # Arquivo para o uso dos targets do matheus
+                    #training_targets = np.load('/home/mathlima/dataset/' + video_index +'/output_targets.npy')
+                    #training_targets = np.mean(training_targets, axis=1)
+
+                    #number_frames =  training_targets.shape[0] 
+                    #auxiliary = auxiliary + number_frames
+
+                        
+                    training_frames = np.load(os.path.join(PATH_FEATURES_FELIPE,video_index+'_features.npy'))
+                    #training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE,video_index+'_targets.npy'))
+                    #training_targets = np.mean(training_targets, axis=1)
+                    
+                    #training_frames = np.load(os.path.join(PATH_FEATURES_CAROL,'Features_'+video_index+'.npy'))
+                    #training_targets = np.load(os.path.join(PATH_FEATURES_CAROL,'Sound-Pressures_'+ video_index +'.npy'))
+
+                    #training_frames = torch.tensor(training_frames_m[begin_index:auxiliary])
+                    #training_frames = torch.from_numpy(train_frames_tensor[0]).float()
+                    #training_frames = training_frames.to(device)
+                    
+                    predictions = model(train_frames_tensor)
+                    predictions = predictions.detach().numpy()
+                    
+                    predict_files_path = os.path.join(training_results_path,'files_predictions/','fold_'+str(fold_index)+'/')
+                
+                    if not os.path.exists(predict_files_path):
+                        os.makedirs(predict_files_path)
+
+                    np.save(predict_files_path + 'predictions_'+ video_index,predictions)
+ 
+
+                    list_predictions.append(predictions)
+                    
+                    predictions = np.squeeze(predictions)
+                    
+                    df_pressure = pd.DataFrame(training_targets,columns=['Real_samples_best_model'])
+                    df_prediction = pd.DataFrame(predictions,columns=['Predicted_samples_best_model'])
+                    
+                    df_prediction['Predicted_samples_best_model'] = df_prediction['Predicted_samples_best_model'].astype(float)
+                    
+                    #df_pressure.to_csv(training_results_path+"Real_samples_best_model.csv", columns = ['Real_samples_best_model'])
+                    #df_prediction.to_csv(training_results_path+"Predicted_samples_best_model.csv", columns = ['Predicted_samples_best_model'])
+                   
+
+                    best_model_predict_path = os.path.join(training_results_path,'best_model/predictions_of_each_video_in_fold_'+str(fold_index)+'/')
+                    
+                    if not os.path.exists(best_model_predict_path):
+                        os.makedirs(best_model_predict_path)
+                
+                    graphic_of_video_predictions(df_pressure,df_prediction,fold_index,video_index,best_model_predict_path)
+                    
+                    #begin_index = auxiliary
+            
+                """
+            for batch_index in list_predictions:
+                for prediction_index in range(batch_index.shape[0]):
+                    list_of_all_predictions.append(batch_index[prediction_index])
+            print(f'len list all predictions {len(list_of_all_predictions)}')
+            
+            list_of_all_predictions = np.array(list_of_all_predictions,dtype= 'float64')
+            list_of_all_predictions = np.squeeze(list_of_all_predictions)
+            
+            val_pressures_array = np.array(val_pressures_array,dtype= 'float64')
+            val_pressures_array = np.squeeze(val_pressures_array)
+
+            # Calculando a correlação
+            correlation = pearsonr(val_pressures_array ,list_of_all_predictions)
+            
+            history_file = open(file_path,'a')
+            history_file.write('\nCorrelação: {}\n\n\n'.format(correlation))
+            history_file.close()
+
+            # Plotando as predições de 1 fold inteiro
+
+            predict_files_path = os.path.join(training_results_path,'files_predictions/')
+                
+            if not os.path.exists(predict_files_path):
+                os.makedirs(predict_files_path)
+
+            np.save(predict_files_path +'predictions_fold_'+str(fold_index),list_of_all_predictions)
+
+            df_pressure = pd.DataFrame(val_pressures_array,columns=['Real_samples_best_model'])
+            df_prediction = pd.DataFrame(list_of_all_predictions,columns=['Predicted_samples_best_model'])
+                    
+            graphic_of_fold_predictions(df_pressure,df_prediction,fold_index,predict_files_path)
+
+            
+            if (LSTM == False):
+                # Plotando o gráfico de predição para cada video dentro de 1 fold da VGG
+                begin_index = 0
+                auxiliary = 0
+                for video_index in folds[fold_index]['val']:
+                    training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE,video_index+'_targets.npy'))
+                    training_targets = np.mean(training_targets, axis=1)
+                    
+                    number_frames =  training_targets.shape[0] 
+                    auxiliary = auxiliary + number_frames
+
+                    df_prediction['Predicted_samples_best_model'][begin_index:auxiliary]
+
+                    predict_files_path_vgg = os.path.join(predict_files_path,'predictions_of_each_video_in_fold_'+str(fold_index)+'/')
+                    
+                    if not os.path.exists(predict_files_path_vgg):
+                        os.makedirs(predict_files_path_vgg)
+                
+                    graphic_of_video_predictions(df_pressure['Real_samples_best_model'][begin_index:auxiliary],
+                                                df_prediction['Predicted_samples_best_model'][begin_index:auxiliary],
+                                                fold_index,
+                                                video_index,
+                                                predict_files_path_vgg)
+                    begin_index = auxiliary
+
+
+                    
+            # Curva de treino de todos os folds
+
+            # Adicionando os dados de treino e validação nos data frames 
+            val_list.loc[:,'val_loss_'+str(fold_index)]=df_val['val_loss']
+            train_list.loc[:,'train_loss_'+str(fold_index)]=df_train['train_loss']
+            
+       # Plotando a curva de treino de todos os folds
+        graphic_of_training_all_folds(train_list,val_list,training_files_path) 
+            
+            
+
+            
+
+
+
+            
+
+        
+
         
         
+       
+    
+        
+
+         
+            
+            
         
