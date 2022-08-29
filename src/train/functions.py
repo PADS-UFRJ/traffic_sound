@@ -43,7 +43,6 @@ class LSTM_Network(nn.Module):
         else:
             self.num_directions = 1 
 
-        self.dense_hidden = nn.Linear(self.hidden_size, self.hidden_size)
         self.dense = nn.Linear(self.hidden_size, self.output_size)
         self.dropout_linear_layer = nn.Dropout(self.dropout_value)
         self.dropout_lstm_layer = nn.Dropout(self.dropout_value_lstm)
@@ -55,7 +54,7 @@ class LSTM_Network(nn.Module):
                             bidirectional=self.bidirectional)
 
     def forward(self, x):
-        x = self.dropout_lstm_layer(x)
+        #x = self.dropout_lstm_layer(x)
 
         # Inicializando os estados ocultos com tensores preenchidos por 0  
         h_0 = Variable(torch.zeros(self.num_layers*self.num_directions, x.size(0), self.hidden_size)) # hidden state
@@ -76,7 +75,6 @@ class LSTM_Network(nn.Module):
         #print(hn.shape)
        
         x = self.dropout_linear_layer(hn)
-        x = self.dense_hidden(x)
         x = self.dense(x)
         #print(x)
         return x     
