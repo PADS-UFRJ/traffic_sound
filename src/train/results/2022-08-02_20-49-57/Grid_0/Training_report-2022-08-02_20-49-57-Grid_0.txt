@@ -1,0 +1,290 @@
+
+Dispositivo usado pelo Pytorch: cuda
+
+Features usadas: Felipe
+
+*****************************************
+
+-----> GRID 0:   hyperparameters
+0               3
+1            adam
+2              32
+3             0.5
+4          0.0001
+5             0.2
+
+ LSTM =True
+
+
+ option_overlap=True , option_causal=False ,option_dropout_lstm=0.2
+
+
+
+--> Fold: 0
+
+Format of train data: frames: 118655 , pressures: 118655 
+
+Format of validation data: frames: 48176 , pressures: 48176 
+
+Option shuffle: True
+
+Begin of training: 2022-08-02 20:50:00
+
+Epoch,train_loss,val_loss,lr
+1,8.410339816118642,1.6932174293989362,0.0001
+2,2.5750189784574706,1.4785437058151383,0.0001
+3,2.3702237733219893,1.5370320840279392,0.0001
+End of training: 2022-08-02 20:51:07
+
+Loss min training: 2.3702237733219893
+
+Loss min val: 1.4785437058151383
+
+Best epoch: 2
+
+Correlação: (0.5525297159060205, 0.0)
+
+
+
+
+--> Fold: 1
+
+Format of train data: frames: 122682 , pressures: 122682 
+
+Format of validation data: frames: 44149 , pressures: 44149 
+
+Option shuffle: True
+
+Begin of training: 2022-08-02 20:51:13
+
+Epoch,train_loss,val_loss,lr
+1,7.449857715441673,2.196794686100027,0.0001
+2,2.5051553858533158,2.4558235756789126,0.0001
+3,2.365751864117574,2.3363956582946126,0.0001
+End of training: 2022-08-02 20:52:23
+
+Loss min training: 2.365751864117574
+
+Loss min val: 2.196794686100027
+
+Best epoch: 1
+
+Correlação: (0.36786738606720115, 0.0)
+
+
+
+
+--> Fold: 2
+
+Format of train data: frames: 127377 , pressures: 127377 
+
+Format of validation data: frames: 39454 , pressures: 39454 
+
+Option shuffle: True
+
+Begin of training: 2022-08-02 20:52:28
+
+Epoch,train_loss,val_loss,lr
+1,8.31706654822116,1.7730228880484251,0.0001
+2,2.6638011841443174,1.9129429467397459,0.0001
+3,2.4795719188247793,2.4278355278560064,0.0001
+End of training: 2022-08-02 20:53:39
+
+Loss min training: 2.4795719188247793
+
+Loss min val: 1.7730228880484251
+
+Best epoch: 1
+
+Correlação: (0.4945400183716667, 0.0)
+
+
+
+
+--> Fold: 3
+
+Format of train data: frames: 125334 , pressures: 125334 
+
+Format of validation data: frames: 41497 , pressures: 41497 
+
+Option shuffle: True
+
+Begin of training: 2022-08-02 20:53:44
+
+Epoch,train_loss,val_loss,lr
+1,8.117678784984733,1.6354319415678618,0.0001
+2,2.6268905307524246,1.609921337400663,0.0001
+3,2.4614155765224033,1.7289679440647205,0.0001
+End of training: 2022-08-02 20:54:54
+
+Loss min training: 2.4614155765224033
+
+Loss min val: 1.609921337400663
+
+Best epoch: 2
+
+Correlação: (0.5938799527793606, 0.0)
+
+
+
+
+--> Fold: 4
+
+Format of train data: frames: 127998 , pressures: 127998 
+
+Format of validation data: frames: 38833 , pressures: 38833 
+
+Option shuffle: True
+
+Begin of training: 2022-08-02 20:55:00
+
+Epoch,train_loss,val_loss,lr
+1,8.082354383697066,1.531380635002494,0.0001
+2,2.554347378289052,1.5990327918317389,0.0001
+3,2.3852341147586276,1.490881071824256,0.0001
+End of training: 2022-08-02 20:56:11
+
+Loss min training: 2.3852341147586276
+
+Loss min val: 1.490881071824256
+
+Best epoch: 3
+
+Correlação: (0.5427244500146342, 0.0)
+
+
+
+
+--> Fold: 5
+
+Format of train data: frames: 123787 , pressures: 123787 
+
+Format of validation data: frames: 43044 , pressures: 43044 
+
+Option shuffle: True
+
+Begin of training: 2022-08-02 20:56:16
+
+Epoch,train_loss,val_loss,lr
+1,7.459020278364593,2.7987148438496123,0.0001
+2,2.4589265962381894,2.8291106342372037,0.0001
+3,2.3490386383753834,2.9441766023037657,0.0001
+End of training: 2022-08-02 20:57:26
+
+Loss min training: 2.3490386383753834
+
+Loss min val: 2.7987148438496123
+
+Best epoch: 1
+
+Correlação: (0.1596023772775122, 1.6419210152778014e-243)
+
+
+
+
+--> Fold: 6
+
+Format of train data: frames: 125799 , pressures: 125799 
+
+Format of validation data: frames: 41032 , pressures: 41032 
+
+Option shuffle: True
+
+Begin of training: 2022-08-02 20:57:32
+
+Epoch,train_loss,val_loss,lr
+1,7.213811525223053,1.9915426546752417,0.0001
+2,2.568388094400673,2.370244799405888,0.0001
+3,2.4082478157466594,2.3296335166043116,0.0001
+End of training: 2022-08-02 20:58:43
+
+Loss min training: 2.4082478157466594
+
+Loss min val: 1.9915426546752417
+
+Best epoch: 1
+
+Correlação: (0.5235798430884575, 0.0)
+
+
+
+
+--> Fold: 7
+
+Format of train data: frames: 121714 , pressures: 121714 
+
+Format of validation data: frames: 45117 , pressures: 45117 
+
+Option shuffle: True
+
+Begin of training: 2022-08-02 20:58:48
+
+Epoch,train_loss,val_loss,lr
+1,7.983231866381454,1.6795406080474429,0.0001
+2,2.6094381679049934,1.6594024620165646,0.0001
+3,2.438511349618663,1.685153267758613,0.0001
+End of training: 2022-08-02 20:59:56
+
+Loss min training: 2.438511349618663
+
+Loss min val: 1.6594024620165646
+
+Best epoch: 2
+
+Correlação: (0.5619822182856781, 0.0)
+
+
+
+
+--> Fold: 8
+
+Format of train data: frames: 132010 , pressures: 132010 
+
+Format of validation data: frames: 46835 , pressures: 46835 
+
+Option shuffle: True
+
+Begin of training: 2022-08-02 21:00:02
+
+Epoch,train_loss,val_loss,lr
+1,7.37761608625793,1.5032400591900066,0.0001
+2,2.566141267401117,1.2546325252902943,0.0001
+3,2.401851242401863,1.3540196747335436,0.0001
+End of training: 2022-08-02 21:01:16
+
+Loss min training: 2.401851242401863
+
+Loss min val: 1.2546325252902943
+
+Best epoch: 2
+
+Correlação: (0.6638312737503429, 0.0)
+
+
+
+
+--> Fold: 9
+
+Format of train data: frames: 131637 , pressures: 131637 
+
+Format of validation data: frames: 47208 , pressures: 47208 
+
+Option shuffle: True
+
+Begin of training: 2022-08-02 21:01:22
+
+Epoch,train_loss,val_loss,lr
+1,7.5369843743995135,1.6695906914324907,0.0001
+2,2.5356479186278262,1.689785740169867,0.0001
+3,2.378619701931504,1.4660074234291611,0.0001
+End of training: 2022-08-02 21:02:36
+
+Loss min training: 2.378619701931504
+
+Loss min val: 1.4660074234291611
+
+Best epoch: 3
+
+Correlação: (0.4395132964923284, 0.0)
+
+
