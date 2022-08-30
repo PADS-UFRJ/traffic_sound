@@ -96,38 +96,39 @@ class LSTM_Dataset(Dataset):
             #training_targets = np.load(os.path.join(PATH_FEATURES_CAROL,'Sound-Pressures_'+ video_index +'.npy'))
             
             # Arquivos do felipe 
-            #training_frames = np.load(os.path.join(PATH_FEATURES_FELIPE + video_index +'_features.npy'))
-            #training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
-            #training_targets = np.mean(training_targets, axis=1)
-
-            # Arquivo para o uso dos targets do matheus
-            training_targets = np.load('/home/mathlima/dataset/' + video_index +'/output_targets.npy')
+            training_frames = np.load(os.path.join(PATH_FEATURES_FELIPE + video_index +'_features.npy'))
+            training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
             training_targets = np.mean(training_targets, axis=1)
 
-            #self.frames_list.append(training_frames)
+            # Arquivo para o uso dos targets do matheus
+            #training_targets = np.load('/home/mathlima/dataset/' + video_index +'/output_targets.npy')
+            #training_targets = np.mean(training_targets, axis=1)
+
+            self.frames_list.append(training_frames)
             self.pressures_list.append(training_targets)
-        """
+        
         for i in self.frames_list:
             for j in range(i.shape[0]):
                 self.list_of_all_frames.append(i[j])
-        """
+        
         for i in self.pressures_list:
             for j in range(i.shape[0]):
                 self.list_of_all_pressures.append(i[j])
         print(f'len pressure list {len(self.list_of_all_pressures)}') 
-        #self.frames_array = np.array(self.list_of_all_frames)
+        self.frames_array = np.array(self.list_of_all_frames)
         self.pressures_array = np.array(self.list_of_all_pressures)
         
         # features-train do matheus
+        """
         path_matheus = '/home/mathlima/dataset/folds/vgg16/'
         if self.m == 'train':
             training_frames = np.load(path_matheus+'fold_'+ str(self.fold_number)+'_train_input_data_gap.npy')
         else:
             training_frames = np.load(path_matheus+'fold_'+ str(self.fold_number)+'_test_input_data_gap.npy')
-    
+        
         print(f'shape trainining {training_frames.shape}')    
-
-        self.frames_array = torch.from_numpy(training_frames).float()
+        """
+        self.frames_array = torch.from_numpy(self.frames_array).float()
         self.pressures_array = torch.from_numpy(self.pressures_array).float()
         print(f'shape trainining again {self.frames_array.shape}')    
 
