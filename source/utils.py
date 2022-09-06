@@ -13,7 +13,7 @@ def alphanum_key(s):
     Turn a string into a list of string and number chunks.
         "z23a" -> ["z", 23, "a"]
     """
-    return [ tryint(c) for c in split('([0-9]+)', s) ]
+    return [ tryint(c) for c in split('([0-9]+)', str(s)) ]
 
 def sort_nicely(l):
     """
