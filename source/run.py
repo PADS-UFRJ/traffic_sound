@@ -218,7 +218,8 @@ if __name__ == '__main__':
                 time_list.append( end - begin )
 
                 # Salvando o modelo de melhor loss
-                checkpoint_save_path = os.path.join(RESULTS_DIR, fold['name'] + '_checkpoint.pth')
+                # checkpoint_save_path = os.path.join(RESULTS_DIR, fold['name'] + '_checkpoint.pth')
+                checkpoint_save_path = os.path.join(RESULTS_DIR, 'checkpoints', fold['name'] + '_checkpoint.pth')
                 if test_loss < min_test_loss:
                     min_test_loss = test_loss
                     torch.save(model.state_dict(), checkpoint_save_path)
@@ -226,7 +227,8 @@ if __name__ == '__main__':
                 print(f'Epoch: {epochs_index+1}\t Train Loss: {round(train_loss,4)} \t Test Loss: {round(test_loss,4)} \t (Best: {round(min_test_loss,4)}) \t [{round(time_list[-1], 1)}s]')
 
 
-            model_save_path = os.path.join(RESULTS_DIR, fold['name'] + '_model.pth')
+            # model_save_path = os.path.join(RESULTS_DIR, fold['name'] + '_model.pth')
+            model_save_path = os.path.join(RESULTS_DIR, 'model_params', fold['name'] + '_model.pth')
             torch.save(model.state_dict(), model_save_path)
 
             results_df[ fold['name'] + '_trn'] = train_loss_list
@@ -245,7 +247,8 @@ if __name__ == '__main__':
             plt.ylim(bottom=0, top=3)
             plt.title(model.name+'/'+fold['name'])
             plt.legend()
-            plt.savefig( os.path.join(RESULTS_DIR, fold["name"] + '_plot.png') )
+            # plt.savefig( os.path.join(RESULTS_DIR, fold["name"] + '_plot.png') )
+            plt.savefig( os.path.join(RESULTS_DIR, 'plots', fold["name"] + '_plot.png') )
 
             results_df[ fold['name'] + '_trn'] = results_df[ fold['name'] + '_trn'].round(4)
             results_df[ fold['name'] + '_val'] = results_df[ fold['name'] + '_val'].round(4)
