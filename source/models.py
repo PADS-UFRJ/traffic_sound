@@ -59,6 +59,8 @@ class VggFeatureExtractor(nn.Module):
                 pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_corrio_batch_64_p4096_vgg_queue_192_e3000_20220704/barlowtwins_vgg16.pth'
             elif vgg == 'vggNTCOR3k':
                 pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_corrio_batch_64_p4096_vgg_queue_192_e3000_20220816/barlowtwins_vgg16.pth'
+            elif vgg == 'vggNTCOR1k5':
+                pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_corrio_batch_64_p4096_vgg_queue_192_e1500_20220826/barlowtwins_vgg16.pth'
             else:
                 raise Exception(f'Unknown model chosen: {vgg}')
 
