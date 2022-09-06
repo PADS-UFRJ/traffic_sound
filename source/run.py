@@ -131,6 +131,14 @@ if __name__ == '__main__':
         if not os.path.isdir( RESULTS_DIR ):
             os.makedirs( RESULTS_DIR )
 
+        if not os.path.isdir( os.path.join( RESULTS_DIR, 'checkpoints' ) ):
+            os.makedirs( os.path.join( RESULTS_DIR, 'checkpoints' ) )
+
+        if not os.path.isdir( os.path.join( RESULTS_DIR, 'model_params' ) ):
+            os.makedirs( os.path.join( RESULTS_DIR, 'model_params' ) )
+
+        if not os.path.isdir( os.path.join( RESULTS_DIR, 'plots' ) ):
+            os.makedirs( os.path.join( RESULTS_DIR, 'plots' ) )
 
         # salvando o modelo e os hiperparametros de treino em um JSON para facilitar o acesso posteriormente
         json_path = os.path.join(RESULTS_DIR, 'hyperparams.json')
