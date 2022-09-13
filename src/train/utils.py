@@ -3,7 +3,7 @@
 epochs = [100]
 opt = ['adam']
 batch = [32]
-dropout = [0.5] # dropout 0 não dá certo !
+dropout = [0.7] # dropout 0 não dá certo !
 dropout_lstm = [0.5]
 lr = [1e-4]
 
