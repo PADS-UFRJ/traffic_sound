@@ -1,0 +1,11 @@
+{
+    "name": "model_63_NTCOR1k5",
+    "layers": {
+        "feature_extractor": "vggNTCOR1k5",
+        "fc_network": {
+            "input_size": 512,
+            "hidden_layers": [128],
+            "output_size": 1
+        }
+    }
+}

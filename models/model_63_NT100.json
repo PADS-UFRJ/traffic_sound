@@ -1,0 +1,11 @@
+{
+    "name": "model_63_NT100",
+    "layers": {
+        "feature_extractor": "vggNT100",
+        "fc_network": {
+            "input_size": 512,
+            "hidden_layers": [128],
+            "output_size": 1
+        }
+    }
+}
