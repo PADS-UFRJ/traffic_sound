@@ -35,34 +35,25 @@ class VggFeatureExtractor(nn.Module):
     def __init__(self, vgg, name=None):
         super().__init__() # executamos a inicializacao da classe superior
 
+        self.name = (str(vgg) + "_feat_extr") if name is None else name
         if vgg == 'vgg16':
-            self.name = 'vgg16_feat_xtr' if name is None else name
             vgg = vision.models.vgg16(pretrained=True)
         else:
-            if vgg == 'vggNT100':
-                self.name = 'vggNT100_feat_xtr' if name is None else name
-                pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg/barlowtwins_vgg16.pth'
-            elif vgg == 'vggNT500':
-                self.name = 'vggNT500_feat_xtr' if name is None else name
-                pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg_e500_2/barlowtwins_vgg16.pth'
-            elif vgg == 'vggNT3k':
-                self.name = 'vggNT3k_feat_xtr' if name is None else name
-                pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg_queue_192_e3000_20220511/barlowtwins_vgg16.pth'
-            elif vgg == 'vggNT6k_subset50':
-                self.name = 'vggNT6k_subset50_feat_xtr' if name is None else name
-                pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg_queue_192_e6000_subset_50_20220609/barlowtwins_vgg16.pth'
-            elif vgg == 'vggNT12k_subset25':
-                self.name = 'vggNT12k_subset25_feat_xtr' if name is None else name
-                pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg_queue_192_e12000_subset_25_20220627/barlowtwins_vgg16.pth'
-            elif vgg == 'vggCOR3k':
-                self.name = 'vggCOR3k_feat_xtr' if name is None else name
-                pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_corrio_batch_64_p4096_vgg_queue_192_e3000_20220704/barlowtwins_vgg16.pth'
-            elif vgg == 'vggNTCOR3k':
-                pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_corrio_batch_64_p4096_vgg_queue_192_e3000_20220816/barlowtwins_vgg16.pth'
-            elif vgg == 'vggNTCOR1k5':
-                pretrained_model_file = '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_corrio_batch_64_p4096_vgg_queue_192_e1500_20220826/barlowtwins_vgg16.pth'
-            else:
+            known_models = {
+                'vggNT100':          '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg/barlowtwins_vgg16.pth',
+                'vggNT500':          '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg_e500_2/barlowtwins_vgg16.pth',
+                'vggNT3k':           '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg_queue_192_e3000_20220511/barlowtwins_vgg16.pth',
+                'vggNT6k_subset50':  '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg_queue_192_e6000_subset_50_20220609/barlowtwins_vgg16.pth',
+                'vggNT12k_subset25': '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_batch_64_p4096_vgg_queue_192_e12000_subset_25_20220627/barlowtwins_vgg16.pth',
+                'vggCOR3k':          '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_corrio_batch_64_p4096_vgg_queue_192_e3000_20220704/barlowtwins_vgg16.pth',
+                'vggNTCOR3k':        '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_corrio_batch_64_p4096_vgg_queue_192_e3000_20220816/barlowtwins_vgg16.pth',
+                'vggNTCOR1k5':       '/home/pedrocayres/unsupervised/barlowtwins/checkpoint_nittrans_corrio_batch_64_p4096_vgg_queue_192_e1500_20220826/barlowtwins_vgg16.pth'
+            }
+
+            if vgg not in known_models:
                 raise Exception(f'Unknown model chosen: {vgg}')
+
+            pretrained_model_file = known_models[vgg]
 
             # inicializando modelo
             vgg = vision.models.vgg16(pretrained=False)
