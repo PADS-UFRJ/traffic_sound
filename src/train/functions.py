@@ -472,6 +472,7 @@ def graphic_of_fold_predictions(df_pressures,df_prediction,fold_index,path):
     plt.savefig(predict_path+'Predicition-Fold_'+str(fold_index)+'.png')
     plt.clf()
 
+# Função que salva o estado dos códigos no início do treino
 def save_current_version_os_codes(time_file):
   
     source_train = "/home/caroline/traffic_sound/src/train/train.py"
@@ -491,83 +492,3 @@ def save_current_version_os_codes(time_file):
     os.system('mv '+destination_utils+' '+"/home/caroline/traffic_sound/src/train/results/"+time_file+"/utils-"+time_file+".py")
     os.system('mv '+destination_functions+' '+"/home/caroline/traffic_sound/src/train/results/"+time_file+"/functions-"+time_file+".py")
 
-
-
-"""
-# Teste da reunião do dia 20/07/22 (verificação da ponderação antiga para a vgg )
-# Função de treino 
-def train(model,dataloader,loss_function,optimizer):
-    model.train()
-    train_loss = 0.0
-    #list_of_predictions = []
-    #list_of_pressures = []
-    for frames,pressure in dataloader:        
-        frames, pressure = frames.to(device), pressure.to(device)
-
-        pressure_aux = pressure 
-        pressures = pressure_aux[:,None]
-        
-        # Passando os dados para o modelo para obter as predições
-        pred = model(frames)
-
-        # Calculando a perda através da função de perda
-        loss = loss_function(pred,pressures)
-
-        # Zerando os gradientes acumulados.O Pytorch vai acumulando os gradientes de acordo com as operações realizadas .  
-        optimizer.zero_grad()
-
-        # Calculando os gradientes
-        loss.backward()
-
-        # Tendo o gradiente já calculado , o step indica a direção que reduz o erro que vamos andar 
-        optimizer.step()
-
-        # Loss é um tensor!
-        train_loss += loss.item()
-        
-        '''
-        # Pegando as predições e as pressões na ultima época 
-        if last_epoch == True:
-            pred = pred.cpu()
-            pred_numpy = pred.detach().numpy()
-            list_of_predictions.append(pred_numpy)
-            pressure = pressure.cpu()
-            pressures_numpy = pressure.detach().numpy()
-            list_of_pressures.append(pressures_numpy)
-        '''    
-        
-    #return ((train_loss/len(dataloader)),list_of_predictions,list_of_pressures)
-    return (train_loss/len(dataloader))
-    
-# Função de teste 
-def test(model,dataloader,loss_function,path,fold_index):
-    model.eval()
-    test_loss = 0.0
-    min_test_loss = np.inf
-    with torch.no_grad():
-        for frames,pressure in dataloader:
-            
-            frames, pressure = frames.to(device), pressure.to(device)
-            
-            pressure_aux = pressure 
-            pressure = pressure_aux[:,None]
-            
-            # Passando os dados para o modelo para obter as predições
-            pred = model(frames)
-
-            # Calculando a perda através da função de perda
-            loss = loss_function(pred,pressure)
-
-            test_loss += loss.item()
-            if min_test_loss > test_loss:
-                #print(f'Validation Loss Decreased({min_test_loss:.6f}--->{test_loss:.6f}) \t Saving The Model')
-                min_test_loss = test_loss
-                best_model_saved_path = path + '/' + 'best_model' + '/' 
-
-                if not os.path.exists(best_model_saved_path):
-                    os.makedirs(best_model_saved_path)
-
-                # Salvando o modelo 
-                torch.save(model.state_dict(),best_model_saved_path+'best_model_fold_'+str(fold_index)+'.pth')
-        return test_loss/len(dataloader)
-"""
