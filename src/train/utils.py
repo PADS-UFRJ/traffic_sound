@@ -13,14 +13,12 @@ LSTM = True
 FEATURES = 'Felipe' # 'Matheus' 
 size_windows = 32 
 num_layers = 1 # Número de camadas lstm empilhadas no modelo
-#dropout_value_lstm = 0.2
 bidirectional = False
 option_overlap = True
 option_causal = False
 
 OPTION_SHUFFLE = True
 OPTION_NUM_WORKERS = 3
-#BATCH_SIZE = 32
 INPUT_SIZE_FEATURES = 512
 HIDDEN_SIZE = 128
 OUTPUT_SIZE_FEATURES = 1

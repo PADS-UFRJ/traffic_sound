@@ -282,8 +282,8 @@ class VGG_Dataset(Dataset):
             
             # Arquivos do felipe 
             training_frames = np.load(os.path.join(PATH_FEATURES_FELIPE + video_index +'_features.npy'))
-            #training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
-            #training_targets = np.mean(training_targets, axis=1)
+            training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
+            training_targets = np.mean(training_targets, axis=1)
     
             # Arquivo para o uso dos targets do matheus
             if (FEATURES == 'Matheus'):

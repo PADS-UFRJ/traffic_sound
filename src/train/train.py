@@ -291,7 +291,7 @@ if __name__ == '__main__':
             correlation = pearsonr(val_pressures_array ,list_of_all_predictions)
             
             history_file = open(file_path,'a')
-            history_file.write('\nCorrelação: {}\n\n\n'.format(correlation))
+            history_file.write('\nCorrelation: {}\n\n\n'.format(correlation))
             history_file.close()
 
             # Plotando as predições de 1 fold inteiro
