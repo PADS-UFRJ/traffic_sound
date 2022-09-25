@@ -74,9 +74,9 @@ class LSTM_Network(nn.Module):
         # Remodelando os dados para pode usar na camada dense 
         hn = hn.view(-1, self.hidden_size) # shape de hn -> [32,128]
         #print(hn.shape)
-       
+
         x = self.dropout_linear_layer(hn)
-        x = self.dense_hidden(x)
+        x = torch.tanh(self.dense_hidden(x))
         x = self.dense(x)
         #print(x)
         return x     
