@@ -286,8 +286,9 @@ class VGG_Dataset(Dataset):
             #training_targets = np.mean(training_targets, axis=1)
     
             # Arquivo para o uso dos targets do matheus
-            training_targets = np.load('/home/mathlima/dataset/' + video_index +'/output_targets.npy')
-            training_targets = np.mean(training_targets, axis=1)
+            if (FEATURES == 'Matheus'):
+                training_targets = np.load('/home/mathlima/dataset/' + video_index +'/output_targets.npy')
+                training_targets = np.mean(training_targets, axis=1)
 
             self.frames_list.append(training_frames)
             self.pressures_list.append(training_targets)
@@ -303,7 +304,19 @@ class VGG_Dataset(Dataset):
         self.frames_array = np.array(self.list_of_all_frames)
         self.pressures_array = np.array(self.list_of_all_pressures)
 
-        self.frames_array = torch.from_numpy(self.frames_array).float()
+        if (FEATURES == 'Matheus'):
+            # features-train do matheus
+            path_matheus = '/home/mathlima/dataset/folds/vgg16/'
+            if self.mode == 'train':
+                training_frames = np.load(path_matheus+'fold_'+ str(self.fold_number)+'_train_input_data_gap.npy')
+            else:
+                training_frames = np.load(path_matheus+'fold_'+ str(self.fold_number)+'_test_input_data_gap.npy')
+            
+            self.frames_array = torch.from_numpy(training_frames).float() # isso para as features do matheus!
+        else:
+            self.frames_array = torch.from_numpy(self.frames_array).float()
+
+        
         self.pressures_array = torch.from_numpy(self.pressures_array).float()
 
 
@@ -320,7 +333,6 @@ class VGG_Dataset(Dataset):
         return self.data_len
 
 # Função de treino 
-
 def train(model,train_dataset,loss_function,optimizer,batch_grid):
     model.train()
     train_loss = 0.0
