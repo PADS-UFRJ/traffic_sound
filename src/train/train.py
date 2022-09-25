@@ -30,7 +30,7 @@ if __name__ == '__main__':
     else:
         permutation = list(itertools.product(epochs,opt,batch,dropout,lr))
     
-    #time_file = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
     time_file = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
     file_name = 'Training_report-'+ time_file     
@@ -38,6 +38,7 @@ if __name__ == '__main__':
     train_list = pd.DataFrame()
     val_list = pd.DataFrame()
 
+    # Loop do Grid Search
     for permutation_index in range(len(permutation)):
         df = pd.DataFrame(list(zip(permutation[permutation_index])),columns = ['hyperparameters'])
         
@@ -70,12 +71,12 @@ if __name__ == '__main__':
         history_file.close()
             
 
-
         if(LSTM == True):
             history_file = open(file_path,'a')
             history_file.write('\n LSTM ={}\n\n'.format(LSTM))
             history_file.write('\n option_overlap={} , option_causal={} ,option_dropout_lstm={}\n\n'.format(option_overlap,option_causal,dropout_lstm_grid))
             history_file.close()
+
 
         # Loop de treino e validação para os 10 folds
         for fold_index in range(folds_number):
@@ -117,8 +118,6 @@ if __name__ == '__main__':
              
             
             len_train = len(train_dataset)
-            # teste do dia 200722
-            #train_loader = DataLoader(train_dataset,batch_size = batch_grid,shuffle=True,num_workers=3)#,collate_fn=collate_fn)
             
             print(f' len train {len_train}')
             
@@ -155,8 +154,6 @@ if __name__ == '__main__':
                     
 
             len_val = len(val_dataset)
-            # teste do dia 200722
-            #test_loader = DataLoader(val_dataset,batch_size = batch_grid,shuffle=True,num_workers=3)
             
             for index in range(len_val):
                 val_frame,val_pressure = val_dataset[index] 
@@ -196,13 +193,11 @@ if __name__ == '__main__':
             # Otimizador 
             optimizer = optimizer_config(optmizer_grid,model,lr_grid)
             
-            #last_epoch = False
+            
             list_loss_train = []
             list_loss_val = []
             list_predictions = []
             list_of_all_predictions = []
-            #predictions = []
-            #pressures = []
             min_val_loss = np.inf
 
             begin = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -216,9 +211,8 @@ if __name__ == '__main__':
             for epochs_index in range(epochs_grid):
 
                 train_loss = train(model,train_dataset,loss_function,optimizer,batch_grid)
-                ##train_loss = train(model,train_loader,loss_function,optimizer) #teste do dia 200722
+                
                 val_loss = validation(model,val_dataset,loss_function,training_results_path,fold_index,batch_grid)
-                ##val_loss = test(model,test_loader,loss_function,training_results_path,fold_index) #teste do dia 200722
                 
                 if min_val_loss > val_loss:
                     min_val_loss = val_loss
@@ -259,41 +253,7 @@ if __name__ == '__main__':
             history_file.write('\nBest epoch: {}\n'.format(epoch_of_min_val_loss))
             history_file.close()  
 
-            """
-            # Gráfico de predição
-            list_of_all_pressures = []
-            
-
-            print(f'len predictions {len(predictions)}')
-            for i in predictions:
-                for j in range(i.shape[0]):
-                    list_of_all_predictions.append(i[j])
-            print(f'len list all predictions {len(list_of_all_predictions)}')
-            
-            
-            list_of_all_predictions = np.array(list_of_all_predictions,dtype= 'float64')
-            list_of_all_predictions = np.squeeze(list_of_all_predictions)
-
-            for i in pressures:
-                for j in range(i.shape[0]):
-                    list_of_all_pressures.append(i[j])
-            
-            
-            pressure_npy = np.array(list_of_all_pressures,dtype= 'float64')
-            pressure_npy = np.squeeze(pressure_npy)
-            
-
-            # Calculando a correlação
-
-            correlation = pearsonr(pressure_npy,list_of_all_predictions)
-            
-            history_file = open(file_path,'a')
-            history_file.write('\nCorrelação: {}\n\n\n'.format(correlation))
-            history_file.close()
-
-            # Plotando gráfcos de predições pelo modelo carregado 
-            list_predictions = []
-            """
+        
             try: 
                 
                 #last_epoch_model_path = os.path.join(training_results_path,'last_epoch_model/'+'model_last_epoch_fold_'+str(fold_index)+'.pth')
@@ -315,66 +275,7 @@ if __name__ == '__main__':
                         # Passando os dados para o modelo para obter as predições
                         pred = model(frames)
                         list_predictions.append(pred)
-                    """
-                # Plotando o gráfico de predição para cada video dentro de 1 fold
-                #begin_index = 0
-                #auxiliary = 0
-                #training_frames_m = np.load(path_matheus+'fold_'+ str(fold_index)+'_train_input_data_gap.npy')
-                #print(type(training_frames_m))
-                for video_index in folds[fold_index]['train']:
-                    # Arquivo para o uso dos targets do matheus
-                    #training_targets = np.load('/home/mathlima/dataset/' + video_index +'/output_targets.npy')
-                    #training_targets = np.mean(training_targets, axis=1)
-
-                    #number_frames =  training_targets.shape[0] 
-                    #auxiliary = auxiliary + number_frames
-
-                        
-                    training_frames = np.load(os.path.join(PATH_FEATURES_FELIPE,video_index+'_features.npy'))
-                    #training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE,video_index+'_targets.npy'))
-                    #training_targets = np.mean(training_targets, axis=1)
-                    
-                    #training_frames = np.load(os.path.join(PATH_FEATURES_CAROL,'Features_'+video_index+'.npy'))
-                    #training_targets = np.load(os.path.join(PATH_FEATURES_CAROL,'Sound-Pressures_'+ video_index +'.npy'))
-
-                    #training_frames = torch.tensor(training_frames_m[begin_index:auxiliary])
-                    #training_frames = torch.from_numpy(train_frames_tensor[0]).float()
-                    #training_frames = training_frames.to(device)
-                    
-                    predictions = model(train_frames_tensor)
-                    predictions = predictions.detach().numpy()
-                    
-                    predict_files_path = os.path.join(training_results_path,'files_predictions/','fold_'+str(fold_index)+'/')
-                
-                    if not os.path.exists(predict_files_path):
-                        os.makedirs(predict_files_path)
-
-                    np.save(predict_files_path + 'predictions_'+ video_index,predictions)
- 
-
-                    list_predictions.append(predictions)
-                    
-                    predictions = np.squeeze(predictions)
-                    
-                    df_pressure = pd.DataFrame(training_targets,columns=['Real_samples_best_model'])
-                    df_prediction = pd.DataFrame(predictions,columns=['Predicted_samples_best_model'])
-                    
-                    df_prediction['Predicted_samples_best_model'] = df_prediction['Predicted_samples_best_model'].astype(float)
-                    
-                    #df_pressure.to_csv(training_results_path+"Real_samples_best_model.csv", columns = ['Real_samples_best_model'])
-                    #df_prediction.to_csv(training_results_path+"Predicted_samples_best_model.csv", columns = ['Predicted_samples_best_model'])
                    
-
-                    best_model_predict_path = os.path.join(training_results_path,'best_model/predictions_of_each_video_in_fold_'+str(fold_index)+'/')
-                    
-                    if not os.path.exists(best_model_predict_path):
-                        os.makedirs(best_model_predict_path)
-                
-                    graphic_of_video_predictions(df_pressure,df_prediction,fold_index,video_index,best_model_predict_path)
-                    
-                    #begin_index = auxiliary
-            
-                """
             for batch_index in list_predictions:
                 for prediction_index in range(batch_index.shape[0]):
                     list_of_all_predictions.append(batch_index[prediction_index])
