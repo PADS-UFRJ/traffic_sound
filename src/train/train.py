@@ -82,9 +82,9 @@ if __name__ == '__main__':
             print(f'----> Fold {fold_index}')
 
             # Setando a seed do pytorch,numpy e do python !
-            torch.manual_seed(22)
-            np.random.seed(22)
-            random.seed(22)
+            torch.manual_seed(SEED_NUMBER)
+            np.random.seed(SEED_NUMBER)
+            random.seed(SEED_NUMBER)
 
             history_file = open(file_path,'a')
             history_file.write('\n\n--> Fold: {}\n'.format(fold_index))
