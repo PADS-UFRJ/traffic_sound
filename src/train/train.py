@@ -4,8 +4,7 @@ import os
 import pandas as pd
 import itertools
 from itertools import product
-import sqlite3
-import time
+import random
 from datetime import datetime
 import matplotlib.pyplot as plt
 from scipy import stats
@@ -71,9 +70,6 @@ if __name__ == '__main__':
         history_file.close()
             
 
-        # Setando a seed do pytorch e do numpy !
-        torch.manual_seed(22)
-        np.random.seed(22)
 
         if(LSTM == True):
             history_file = open(file_path,'a')
@@ -84,7 +80,12 @@ if __name__ == '__main__':
         # Loop de treino e validação para os 10 folds
         for fold_index in range(folds_number):
             print(f'----> Fold {fold_index}')
-            
+
+            # Setando a seed do pytorch,numpy e do python !
+            torch.manual_seed(22)
+            np.random.seed(22)
+            random.seed(22)
+
             history_file = open(file_path,'a')
             history_file.write('\n\n--> Fold: {}\n'.format(fold_index))
             history_file.close()
