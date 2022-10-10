@@ -70,7 +70,10 @@ if __name__ == '__main__':
         history_file.write('\n-----> GRID {}: {}\n'.format(permutation_index,df))
         history_file.close()
             
-
+        # Setando a seed do pytorch,numpy e do python !
+        torch.manual_seed(SEED_NUMBER)
+        np.random.seed(SEED_NUMBER)
+        
         if(LSTM == True):
             history_file = open(file_path,'a')
             history_file.write('\n LSTM ={}\n\n'.format(LSTM))
@@ -81,12 +84,7 @@ if __name__ == '__main__':
         # Loop de treino e validação para os 10 folds
         for fold_index in range(folds_number):
             print(f'----> Fold {fold_index}')
-
-            # Setando a seed do pytorch,numpy e do python !
-            torch.manual_seed(SEED_NUMBER)
-            np.random.seed(SEED_NUMBER)
-            random.seed(SEED_NUMBER)
-
+            
             history_file = open(file_path,'a')
             history_file.write('\n\n--> Fold: {}\n'.format(fold_index))
             history_file.close()
