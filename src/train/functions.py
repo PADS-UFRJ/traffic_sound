@@ -75,8 +75,8 @@ class LSTM_Network(nn.Module):
         hn = hn.view(-1, self.hidden_size) # shape de hn -> [32,128]
         #print(hn.shape)
 
-        x = self.dropout_linear_layer(hn)
-        x = torch.tanh(self.dense_hidden(x))
+        x = torch.tanh(self.dense_hidden(hn))
+        x = self.dropout_linear_layer(x)
         x = self.dense(x)
         #print(x)
         return x     
