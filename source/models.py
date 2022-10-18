@@ -4,7 +4,7 @@ import torchvision as vision
 import json
 
 
-def reset_parameters(m):
+def recursive_reset_parameters(m):
     '''
     Try resetting model weights to avoid
     weight leakage.
@@ -15,19 +15,7 @@ def reset_parameters(m):
             layer.reset_parameters()
         else:
             # print(f"Nao possui reset_parameters: {layer}")
-            for sublayer in layer.children():
-                if hasattr(sublayer, 'reset_parameters'):
-                    # print(f'Reset trainable parameters of layer: {sublayer}')
-                    sublayer.reset_parameters()
-                # else:
-                #     print(f"Nao possui reset_parameters: {sublayer}")
-    # for child in m.children():
-    #     for layer in child.children():
-    #         if hasattr(layer, 'reset_parameters'):
-    #             print(f'Reset trainable parameters of layer: {layer}')
-    #             layer.reset_parameters()
-    #         else:
-    #             print(f"Nao possui reset_parameters: {layer}")
+            recursive_reset_parameters(layer)
 
 
 class VggFeatureExtractor(nn.Module):
@@ -75,7 +63,8 @@ class VggFeatureExtractor(nn.Module):
         self.flatten = nn.Flatten(start_dim=1, end_dim=-1)
 
     def reset_parameters(self):
-        reset_parameters(self)
+        # [TODO] recarregar pesos de arquivo ao inves de reiniciar todos os pesos
+        recursive_reset_parameters(self)
     
     def forward(self, x):
         x = self.features(x)
@@ -120,7 +109,7 @@ class FCNetwork(nn.Module):
         self.double()
 
     def reset_parameters(self):
-        reset_parameters(self)
+        recursive_reset_parameters(self)
 
     def forward(self, x):
         for layer in self.layers[:-1]: # Estou pegando todas as camadas,exceto a última 
@@ -166,7 +155,7 @@ class ModelFromDict(nn.Module):
         self.layers = nn.Sequential(*layers)
 
     def reset_parameters(self):
-        reset_parameters(self)
+        recursive_reset_parameters(self)
 
     def forward(self, x):
         # for layer in self.layers:
