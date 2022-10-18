@@ -98,7 +98,6 @@ if __name__ == '__main__':
     permutation = parse_hyperparams(args.params)
 
     for i in range(len(permutation)):
-        # df = pd.DataFrame(list(zip(permutation[i])), columns = ['n'])
         hyperparams = permutation.iloc[i]
 
         # Setando a seed do pytorch e do numpy !
@@ -142,8 +141,6 @@ if __name__ == '__main__':
 
         # salvando o modelo e os hiperparametros de treino em um JSON para facilitar o acesso posteriormente
         json_path = os.path.join(RESULTS_DIR, 'hyperparams.json')
-        # with open(json_path, 'w') as f:
-        #     json.dump(hyperparams, f, indent=4)
         hyperparams.to_json(json_path, indent=4)
 
         json_path = os.path.join(RESULTS_DIR, 'model.json')
@@ -154,14 +151,9 @@ if __name__ == '__main__':
         for fold in folds_list:
             print(f'----> Fold {fold["index"]}')
 
+            torch.manual_seed(22)
+            np.random.seed(22)
             model.reset_parameters()
-            # for layers in model.children():
-            #     for layer in layers:
-            #         if hasattr(layer, 'reset_parameters'):
-            #             print(f'Reset trainable parameters of layer = {layer}')
-            #             layer.reset_parameters()
-            #         else:
-            #             print(f"Nao possui reset_parameters: {layer}")
 
             # Inicializando dicionarios vazios. A chave indica se o elemento retornado eh usado no treino ou no teste
             features_files = {'train': None, 'test': None}
@@ -208,12 +200,9 @@ if __name__ == '__main__':
 
             for epochs_index in range(hyperparams['epochs']):
 
-                # begin = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 begin = time.time()
-                
+
                 train_loss = train(model, dataloaders['train'], loss_function, optimizer, device)
-                
-                # end = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
                 train_loss_list.append(train_loss)
 
@@ -235,7 +224,6 @@ if __name__ == '__main__':
                 print(f'Epoch: {epochs_index+1}\t Train Loss: {round(train_loss,4)} \t Test Loss: {round(test_loss,4)} \t (Best: {round(min_test_loss,4)}) \t [{round(time_list[-1], 1)}s]')
 
 
-            # model_save_path = os.path.join(RESULTS_DIR, fold['name'] + '_model.pth')
             model_save_path = os.path.join(RESULTS_DIR, 'model_params', fold['name'] + '_model.pth')
             torch.save(model.state_dict(), model_save_path)
 
@@ -245,9 +233,6 @@ if __name__ == '__main__':
             val_min = results_df[ fold['name'] + '_val'].min()
 
 
-            # df1 = pd.DataFrame(train_loss_list, columns = ['train_loss'])
-            # loss_min = df1['train_loss'].values.min()
-
             plt.clf()
             plt.plot(train_loss_list, label='trn', color=const.colors[0])
             plt.plot(test_loss_list, label='val', color=const.colors[1])
@@ -255,7 +240,6 @@ if __name__ == '__main__':
             plt.ylim(bottom=0, top=3)
             plt.title(model.name+'/'+fold['name'])
             plt.legend()
-            # plt.savefig( os.path.join(RESULTS_DIR, fold["name"] + '_plot.png') )
             plt.savefig( os.path.join(RESULTS_DIR, 'plots', fold["name"] + '_plot.png') )
 
             results_df[ fold['name'] + '_trn'] = results_df[ fold['name'] + '_trn'].round(4)
