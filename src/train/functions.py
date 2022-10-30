@@ -1,4 +1,5 @@
 from distutils.log import error
+from re import X
 import numpy as np
 import os
 import pandas as pd
@@ -426,7 +427,7 @@ def graphic_of_training(df_train,df_val,fold_index,path,epochs_number):
     plt.clf()
 
 # Função que plota gráfico com a curva de treino de todos os folds 
-def graphic_of_training_all_folds(df_train_all_folds,df_val_all_folds,path):
+def graphic_of_training_all_folds(df_train_all_folds,df_val_all_folds,path,epochs_grid):
     mean_val = pd.DataFrame(columns=['val_loss_mean'])
     mean_train = pd.DataFrame(columns=['train_loss_mean'])
 
@@ -442,6 +443,8 @@ def graphic_of_training_all_folds(df_train_all_folds,df_val_all_folds,path):
         df_column.plot(color='blue',alpha=0.4,ax=plt.gca(),legend=False)
 
     plt.title('Loss_plot-All_Folds')
+    limiar = 5
+    plt.axis([0,epochs_grid,0,limiar])
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
     plt.grid()

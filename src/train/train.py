@@ -82,7 +82,8 @@ if __name__ == '__main__':
 
 
         # Loop de treino e validação para os 10 folds
-        for fold_index in range(folds_number):
+        #for fold_index in range(folds_number):
+        for fold_index in range(1):
             print(f'----> Fold {fold_index}')
             
             history_file = open(file_path,'a')
@@ -230,7 +231,6 @@ if __name__ == '__main__':
             # Curva de treino 
             df_train = pd.DataFrame(list_loss_train, columns = ['train_loss'])
             train_loss_min = df_train['train_loss'].values.min()
-
             df_val = pd.DataFrame(list_loss_val, columns = ['val_loss'])
             val_loss_min = df_val['val_loss'].values.min()
 
@@ -341,7 +341,7 @@ if __name__ == '__main__':
             train_list.loc[:,'train_loss_'+str(fold_index)]=df_train['train_loss']
             
        # Plotando a curva de treino de todos os folds
-        graphic_of_training_all_folds(train_list,val_list,training_files_path) 
+        graphic_of_training_all_folds(train_list,val_list,training_files_path,epochs_grid) 
             
             
 
