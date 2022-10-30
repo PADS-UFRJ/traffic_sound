@@ -82,8 +82,7 @@ if __name__ == '__main__':
 
 
         # Loop de treino e validação para os 10 folds
-        #for fold_index in range(folds_number):
-        for fold_index in range(1):
+        for fold_index in range(folds_number):
             print(f'----> Fold {fold_index}')
             
             history_file = open(file_path,'a')
@@ -179,7 +178,7 @@ if __name__ == '__main__':
             if(LSTM == True):
                 model = LSTM_Network(INPUT_SIZE_FEATURES,OUTPUT_SIZE_FEATURES,HIDDEN_SIZE,dropout_grid,num_layers,dropout_lstm_grid,bidirectional) 
             else:
-                model = VGG_Network(INPUT_SIZE_FEATURES,OUTPUT_SIZE_FEATURES,[128,128],dropout_grid)
+                model = VGG_Network(INPUT_SIZE_FEATURES,OUTPUT_SIZE_FEATURES,[128],dropout_grid)
             
             print(model)
             model = model.to(device)
