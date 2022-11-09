@@ -150,7 +150,7 @@ if __name__ == '__main__':
             copy(args.model, json_path)
 
         # Loop de treino para os 10 folds
-        for fold in folds_list:
+        for fold in folds_list[:2]:
             print(f'----> Fold {fold["index"]}')
 
             torch.manual_seed(22)
@@ -189,84 +189,72 @@ if __name__ == '__main__':
                 full_datasets[mode] = FeaturesAndTargetsUnionDataset(features_datasets[mode], targets_datasets[mode])
 
                 # [NOTE] por algum motivo, o batch_size era passado como numpy.int64 e o DataLoader nao aceitava
-                hyperparams['batch_size'] = int(hyperparams['batch_size'])
-                # dataloaders[mode] = DataLoader(full_datasets[mode], batch_size=hyperparams['batch_size'], shuffle=True )
-                dataloaders[mode] = DataLoader(full_datasets[mode], batch_size=1, shuffle=False )
+                dataloaders[mode] = DataLoader(full_datasets[mode], batch_size=int(hyperparams['batch_size']), shuffle=True )
 
-            for idx, (frames, pressure) in enumerate(dataloaders['train']):
-                if idx == 0:
-                    print(f'dataloader[0][frames][0].shape {frames[0].shape}')
-                    print(f'dataloader[0][frames][0][0] {frames[0][0]}')
-                    frames, pressure = frames.to(device), pressure.to(device)
-                    pressure_aux = pressure
-                    pressure = pressure_aux[:, None]
+            train_loss_list = []
+            test_loss_list = []
+            time_list = []
+            min_test_loss = np.inf
 
-                    pred = model(frames)
+            print('Iniciando treino')
 
-                    loss = loss_function(pred, pressure)
+            for epochs_index in range(hyperparams['epochs']):
 
-                    print(f" -*- loss: {loss.item()}")
-                    break
-            continue
-        continue
+                begin = time.time()
 
-            # train_loss_list = []
-            # test_loss_list = []
-            # time_list = []
-            # min_test_loss = np.inf
+                train_loss = train(model, dataloaders['train'], loss_function, optimizer, device)
 
-            # print('Iniciando treino')
+                train_loss_list.append(train_loss)
 
-            # for epochs_index in range(hyperparams['epochs']):
+                model.eval()
+                with torch.no_grad():
+                    features = torch.from_numpy(features_datasets['train'][0]).to(device)
+                    pred = model(features)
+                    print(f"features_datasets['train'][0][0]: {features[0]}")
+                    print(f'pred: {pred.item()}')
 
-            #     begin = time.time()
+                test_loss = test(model, dataloaders['test'], loss_function, device)
 
-            #     train_loss = train(model, dataloaders['train'], loss_function, optimizer, device)
+                test_loss_list.append(test_loss)
 
-            #     train_loss_list.append(train_loss)
+                end = time.time()
 
-            #     test_loss = test(model, dataloaders['test'], loss_function, device)
+                time_list.append( end - begin )
 
-            #     test_loss_list.append(test_loss)
+                # Salvando o modelo de melhor loss
+                # checkpoint_save_path = os.path.join(RESULTS_DIR, fold['name'] + '_checkpoint.pth')
+                checkpoint_save_path = os.path.join(RESULTS_DIR, 'checkpoints', fold['name'] + '_checkpoint.pth')
+                if test_loss < min_test_loss:
+                    min_test_loss = test_loss
+                    torch.save(model.state_dict(), checkpoint_save_path)
 
-            #     end = time.time()
-
-            #     time_list.append( end - begin )
-
-            #     # Salvando o modelo de melhor loss
-            #     # checkpoint_save_path = os.path.join(RESULTS_DIR, fold['name'] + '_checkpoint.pth')
-            #     checkpoint_save_path = os.path.join(RESULTS_DIR, 'checkpoints', fold['name'] + '_checkpoint.pth')
-            #     if test_loss < min_test_loss:
-            #         min_test_loss = test_loss
-            #         torch.save(model.state_dict(), checkpoint_save_path)
-
-            #     print(f'Epoch: {epochs_index+1}\t Train Loss: {round(train_loss,4)} \t Test Loss: {round(test_loss,4)} \t (Best: {round(min_test_loss,4)}) \t [{round(time_list[-1], 1)}s]')
+                print(f'Epoch: {epochs_index+1}\t Train Loss: {round(train_loss,4)} \t Test Loss: {round(test_loss,4)} \t (Best: {round(min_test_loss,4)}) \t [{round(time_list[-1], 1)}s]')
 
 
-            # model_save_path = os.path.join(RESULTS_DIR, 'model_params', fold['name'] + '_model.pth')
-            # torch.save(model.state_dict(), model_save_path)
+            model_save_path = os.path.join(RESULTS_DIR, 'model_params', fold['name'] + '_model.pth')
+            torch.save(model.state_dict(), model_save_path)
 
-            # results_df[ fold['name'] + '_trn'] = train_loss_list
-            # results_df[ fold['name'] + '_val'] = test_loss_list
-            # results_df[ fold['name'] + '_time'] = time_list
-            # val_min = results_df[ fold['name'] + '_val'].min()
+            results_df[ fold['name'] + '_trn'] = train_loss_list
+            results_df[ fold['name'] + '_val'] = test_loss_list
+            results_df[ fold['name'] + '_time'] = time_list
+            val_min = results_df[ fold['name'] + '_val'].min()
 
 
-            # plt.clf()
-            # plt.plot(train_loss_list, label='trn', color=const.colors[0])
-            # plt.plot(test_loss_list, label='val', color=const.colors[1])
-            # plt.axhline(y=val_min, color='r', linestyle='--')
-            # plt.ylim(bottom=0, top=3)
-            # plt.title(model.name+'/'+fold['name'])
-            # plt.legend()
-            # plt.savefig( os.path.join(RESULTS_DIR, 'plots', fold["name"] + '_plot.png') )
+            plt.clf()
+            plt.plot(train_loss_list, label='trn', color=const.colors[0])
+            plt.plot(test_loss_list, label='val', color=const.colors[1])
+            plt.axhline(y=val_min, color='r', linestyle='--')
+            plt.ylim(bottom=0, top=3)
+            plt.title(model.name+'/'+fold['name'])
+            plt.legend()
+            plt.savefig( os.path.join(RESULTS_DIR, 'plots', fold["name"] + '_plot.png') )
 
-            # results_df[ fold['name'] + '_trn'] = results_df[ fold['name'] + '_trn'].round(4)
-            # results_df[ fold['name'] + '_val'] = results_df[ fold['name'] + '_val'].round(4)
-            # results_df[ fold['name'] + '_time'] = results_df[ fold['name'] + '_time'].round(3)
+            results_df[ fold['name'] + '_trn'] = results_df[ fold['name'] + '_trn'].round(4)
+            results_df[ fold['name'] + '_val'] = results_df[ fold['name'] + '_val'].round(4)
+            results_df[ fold['name'] + '_time'] = results_df[ fold['name'] + '_time'].round(3)
 
-            # # Salvando os resultados de todos os folds
-            # # (o arquivo eh sobrescrito em cada fold. Eh redundante, porem nao precisamos esperar o treino de todos os folds terminar
-            # # para poder conferir o resultado dos que ja tiverem encerrado)
-            # results_csv_path = os.path.join( RESULTS_DIR, 'history.csv' )
-            # results_df.to_csv( results_csv_path, index=False )
+            # Salvando os resultados de todos os folds
+            # (o arquivo eh sobrescrito em cada fold. Eh redundante, porem nao precisamos esperar o treino de todos os folds terminar
+            # para poder conferir o resultado dos que ja tiverem encerrado)
+            results_csv_path = os.path.join( RESULTS_DIR, 'history.csv' )
+            results_df.to_csv( results_csv_path, index=False )

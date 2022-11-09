@@ -122,11 +122,6 @@ class FeaturesDataset(Dataset):
         if self.transform is not None:
             features = self.transform(features)
 
-        if index == 0:
-            print(f'(in dataset class)')
-            print(f'features[0].shape {features.shape}')
-            print(f'features[0][0] {features[0]}')
-
         return features
 
     ################################################################
