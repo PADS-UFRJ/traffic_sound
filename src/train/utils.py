@@ -9,8 +9,8 @@ lr = [1e-4]
 
 
 # Constantes 
-LSTM = True
-FEATURES = 'Felipe' # 'Matheus' 
+LSTM = False
+FEATURES = 'Felipe' # 'Felipe' ou 'Matheus' ou 'torch_model_with_weights_of_tf/keras' 
 size_windows = 32 
 num_layers = 1 # Número de camadas lstm empilhadas no modelo
 bidirectional = False
@@ -31,7 +31,7 @@ PATH_FEATURES_CAROL = PATH_EXTRACTED_FEATURES+EXTRACTION_MODEL+'/'
 VIDEOS_NUMBER = 38
 PATH_FEATURES_FELIPE = '/home/felipevr/traffic_sound/dataset/preprocessed/features/vgg16/'
 PATH_TARGETS_FELIPE = '/home/felipevr/traffic_sound/dataset/preprocessed/targets/'
-
+PATH_FEATURES_TF_KERAS = '/home/caroline/traffic_sound/src/extraction/traffic_sound/dataset/preprocessed/features/'
 
 # Lista de vídeos
 videos_list = [

@@ -282,18 +282,26 @@ class VGG_Dataset(Dataset):
             #training_targets = np.load(os.path.join(PATH_FEATURES_CAROL,'Sound-Pressures_'+ video_index +'.npy'))
             
             # Arquivos do felipe 
-            training_frames = np.load(os.path.join(PATH_FEATURES_FELIPE + video_index +'_features.npy'))
-            training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
-            training_targets = np.mean(training_targets, axis=1)
-    
+            if (FEATURES == 'Felipe'):
+                training_frames = np.load(os.path.join(PATH_FEATURES_FELIPE + video_index +'_features.npy'))
+                training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
+                training_targets = np.mean(training_targets, axis=1)
+            
             # Arquivo para o uso dos targets do matheus
             if (FEATURES == 'Matheus'):
                 training_targets = np.load('/home/mathlima/dataset/' + video_index +'/output_targets.npy')
                 training_targets = np.mean(training_targets, axis=1)
 
+            # Arquivos para as features extraidas carregando o modelo em pytorch e usando d vgg do tf/keras
+            if (FEATURES == 'torch_model_with_weights_of_tf/keras'):
+                training_frames = np.load(os.path.join(PATH_FEATURES_TF_KERAS + video_index +'_features.npy'))
+                training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
+                training_targets = np.mean(training_targets, axis=1)
+
             self.frames_list.append(training_frames)
             self.pressures_list.append(training_targets)
-
+            print(len(self.frames_list)) 
+            
         for video_index in self.frames_list:
             for frame_index in range(video_index.shape[0]):
                 self.list_of_all_frames.append(video_index[frame_index])
@@ -343,7 +351,7 @@ def train(model,train_dataset,loss_function,optimizer,batch_grid):
    
     for frames,pressure in train_loader:        
         frames, pressure = frames.to(device), pressure.to(device)
-
+        
         pressure_aux = pressure 
         pressures = pressure_aux[:,None]
         
