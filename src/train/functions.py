@@ -496,7 +496,7 @@ def graphic_of_fold_predictions(df_pressures,df_prediction,fold_index,path):
     plt.clf()
 
 # Função que salva o estado dos códigos no início do treino
-def save_current_version_os_codes(time_file):
+def save_current_version_of_codes(time_file):
   
     source_train = "/home/caroline/traffic_sound/src/train/train.py"
     destination_train = "/home/caroline/traffic_sound/src/train/results/"+time_file+"/train.py"

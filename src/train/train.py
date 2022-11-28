@@ -56,7 +56,7 @@ if __name__ == '__main__':
         if not os.path.exists(training_results_path):
             os.makedirs(training_results_path)
         
-        save_current_version_os_codes(time_file)
+        save_current_version_of_codes(time_file)
         
         file_path = training_results_path+file_name+"-Grid_"+str(permutation_index)+'.txt'
 
