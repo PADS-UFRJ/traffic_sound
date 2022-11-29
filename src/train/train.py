@@ -70,9 +70,6 @@ if __name__ == '__main__':
         history_file.write('\n-----> GRID {}: {}\n'.format(permutation_index,df))
         history_file.close()
             
-        # Setando a seed do pytorch,numpy e do python !
-        torch.manual_seed(SEED_NUMBER)
-        np.random.seed(SEED_NUMBER)
         
         if(LSTM == True):
             history_file = open(file_path,'a')
@@ -89,6 +86,10 @@ if __name__ == '__main__':
             history_file.write('\n\n--> Fold: {}\n'.format(fold_index))
             history_file.close()
 
+            # Setando a seed do pytorch,numpy e do python !
+            torch.manual_seed(SEED_NUMBER)
+            np.random.seed(SEED_NUMBER)
+            
             # Dados de treino 
 
             if(LSTM == True):
