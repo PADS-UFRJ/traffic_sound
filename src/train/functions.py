@@ -498,20 +498,20 @@ def graphic_of_fold_predictions(df_pressures,df_prediction,fold_index,path):
 # Função que salva o estado dos códigos no início do treino
 def save_current_version_of_codes(time_file):
   
-    source_train = "/home/caroline/traffic_sound/src/train/train.py"
-    destination_train = "/home/caroline/traffic_sound/src/train/results/"+time_file+"/train.py"
+    source_train = os.getcwd() + "/train.py"
+    destination_train = os.getcwd()+"/results/"+time_file+"/train.py"
     
-    source_utils = "/home/caroline/traffic_sound/src/train/utils.py"
-    destination_utils = "/home/caroline/traffic_sound/src/train/results/"+time_file+"/utils.py"
+    source_utils = os.getcwd()+"/utils.py"
+    destination_utils = os.getcwd()+"/results/"+time_file+"/utils.py"
 
-    source_functions = "/home/caroline/traffic_sound/src/train/functions.py"
-    destination_functions = "/home/caroline/traffic_sound/src/train/results/"+time_file+"/functions.py"
+    source_functions = os.getcwd()+"/functions.py"
+    destination_functions = os.getcwd()+"/results/"+time_file+"/functions.py"
 
     os.system('cp '+source_train+' '+destination_train)
     os.system('cp '+source_utils+' '+destination_utils)
     os.system('cp '+source_functions+' '+destination_functions)
 
-    os.system('mv '+destination_train+' '+"/home/caroline/traffic_sound/src/train/results/"+time_file+"/train-"+time_file+".py")
-    os.system('mv '+destination_utils+' '+"/home/caroline/traffic_sound/src/train/results/"+time_file+"/utils-"+time_file+".py")
-    os.system('mv '+destination_functions+' '+"/home/caroline/traffic_sound/src/train/results/"+time_file+"/functions-"+time_file+".py")
+    os.system('mv '+destination_train+' '+os.getcwd()+"/results/"+time_file+"/train-"+time_file+".py")
+    os.system('mv '+destination_utils+' '+os.getcwd()+"/results/"+time_file+"/utils-"+time_file+".py")
+    os.system('mv '+destination_functions+' '+os.getcwd()+"/results/"+time_file+"/functions-"+time_file+".py")
 
