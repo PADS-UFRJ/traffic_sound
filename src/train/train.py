@@ -89,6 +89,7 @@ if __name__ == '__main__':
             # Setando a seed do pytorch,numpy e do python !
             torch.manual_seed(SEED_NUMBER)
             np.random.seed(SEED_NUMBER)
+            random.seed(SEED_NUMBER)
             
             # Dados de treino 
 
