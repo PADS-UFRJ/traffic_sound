@@ -20,7 +20,7 @@ from Myfolds import *
 from functions import *
 
 # Chama a gpu cuda disponível.Caso não tenha gpu disponível , usa a cpu
-device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda:3" if torch.cuda.is_available() else 'cpu')
 
 
 if __name__ == '__main__':
@@ -77,6 +77,7 @@ if __name__ == '__main__':
             history_file.write('\n option_overlap={} , option_causal={} ,option_dropout_lstm={}\n\n'.format(option_overlap,option_causal,dropout_lstm_grid))
             history_file.close()
 
+        list_val_loss_min = []
 
         # Loop de treino e validação para os 10 folds
         for fold_index in range(folds_number):
@@ -232,8 +233,10 @@ if __name__ == '__main__':
             # Curva de treino 
             df_train = pd.DataFrame(list_loss_train, columns = ['train_loss'])
             train_loss_min = df_train['train_loss'].values.min()
+
             df_val = pd.DataFrame(list_loss_val, columns = ['val_loss'])
             val_loss_min = df_val['val_loss'].values.min()
+            list_val_loss_min.append(val_loss_min)
 
             training_files_path = os.path.join(training_results_path,'files_training/')
                 
@@ -341,10 +344,12 @@ if __name__ == '__main__':
             val_list.loc[:,'val_loss_'+str(fold_index)]=df_val['val_loss']
             train_list.loc[:,'train_loss_'+str(fold_index)]=df_train['train_loss']
             
-       # Plotando a curva de treino de todos os folds
+        # Plotando a curva de treino de todos os folds
         graphic_of_training_all_folds(train_list,val_list,training_files_path,epochs_grid) 
             
-            
+        history_file = open(file_path,'a')
+        history_file.write('\n\nMean validation loss: {}\n'.format(sum(list_val_loss_min)/len(list_val_loss_min)))
+        history_file.close()      
 
             
 
