@@ -7,9 +7,12 @@ dropout = [0.5] # dropout 0 não dá certo !
 dropout_lstm = [0.2]
 lr = [1e-4]
 
+SCHEDULER = True
+NUMBER_STEPS_EPOCHS = 40
+lr_scheduler = [5e-6,1e-6,5e-7]
 
 # Constantes 
-LSTM = False
+LSTM = True
 FEATURES = 'Felipe' # 'Felipe' ou 'Matheus' ou 'torch_model_with_weights_of_tf/keras' 
 size_windows = 32 
 num_layers = 1 # Número de camadas lstm empilhadas no modelo

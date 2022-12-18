@@ -14,6 +14,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
+from torch.optim.lr_scheduler import StepLR
 
 from utils import *
 from Myfolds import *
@@ -196,8 +197,8 @@ if __name__ == '__main__':
 
 
             # Otimizador 
-            optimizer = optimizer_config(optmizer_grid,model,lr_grid)
-            
+            #optimizer = optimizer_config(optmizer_grid,model,lr_grid)
+
             
             list_loss_train = []
             list_loss_val = []
@@ -215,10 +216,31 @@ if __name__ == '__main__':
 
             for epochs_index in range(epochs_grid):
 
+                # Otimizador
+                # Se SCHEDULER = True, temos a lr variando de acordocom as épocas. Não usei a função StepLR do pytorch, pois, neste caso, o gamma varia!
+                if (SCHEDULER):
+                    if (epochs_index < NUMBER_STEPS_EPOCHS):
+                        optimizer = optimizer_config(optmizer_grid,model,lr_scheduler[0])
+                        lr_grid = lr_scheduler[0]
+
+                    elif (epochs_index >= NUMBER_STEPS_EPOCHS and epochs_index <= NUMBER_STEPS_EPOCHS*2):
+                        optimizer = optimizer_config(optmizer_grid,model,lr_scheduler[1])
+                        lr_grid = lr_scheduler[1]
+
+                    elif (epochs_index > NUMBER_STEPS_EPOCHS*2 and epochs_index < epochs_grid ):
+                        optimizer = optimizer_config(optmizer_grid,model,lr_scheduler[2])
+                        lr_grid = lr_scheduler[2]
+
+                else:
+                    # Se SCHEDULER = False, temos um lr constante para todas as épocas.
+                    optimizer = optimizer_config(optmizer_grid,model,lr_grid)     
+
+
                 train_loss = train(model,train_dataset,loss_function,optimizer,batch_grid)
                 
                 val_loss = validation(model,val_dataset,loss_function,training_results_path,fold_index,batch_grid)
                 
+
                 if min_val_loss > val_loss:
                     min_val_loss = val_loss
                     epoch_of_min_val_loss = epochs_index+1
