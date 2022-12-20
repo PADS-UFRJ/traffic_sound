@@ -105,13 +105,26 @@ class LSTM_Dataset(Dataset):
             #training_targets = np.load(os.path.join(PATH_FEATURES_CAROL,'Sound-Pressures_'+ video_index +'.npy'))
             
             # Arquivos do felipe 
-            training_frames = np.load(os.path.join(PATH_FEATURES_FELIPE + video_index +'_features.npy'))
-            training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
-            training_targets = np.mean(training_targets, axis=1)
+            if (FEATURES == 'Felipe'):
+                training_frames = np.load(os.path.join(PATH_FEATURES_FELIPE + video_index +'_features.npy'))
+                training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
+                training_targets = np.mean(training_targets, axis=1)
 
             # Arquivo para o uso dos targets do matheus
             if (FEATURES == 'Matheus'):
                 training_targets = np.load('/home/mathlima/dataset/' + video_index +'/output_targets.npy')
+                training_targets = np.mean(training_targets, axis=1)
+
+             # Arquivos para as features extraidas carregando o modelo de vgg do pytorch e usando os pesos do tf/keras.
+            if (FEATURES == 'torch_model_with_weights_of_tf/keras'):
+                training_frames = np.load(os.path.join(PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS + video_index +'_features.npy'))
+                training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
+                training_targets = np.mean(training_targets, axis=1)
+            
+            # Arquivos para as features extraidas carregando o modelo de vgg do tensorflow e usando os pesos do tf/keras.
+            if (FEATURES == 'tf_model_with_weights_of_tf/keras'):
+                training_frames = np.load(os.path.join(PATH_FEATURES_TF_MODEL_TF_KERAS_WEIGHTS + video_index +'_features.npy'))
+                training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
                 training_targets = np.mean(training_targets, axis=1)
 
             self.frames_list.append(training_frames)
@@ -292,15 +305,21 @@ class VGG_Dataset(Dataset):
                 training_targets = np.load('/home/mathlima/dataset/' + video_index +'/output_targets.npy')
                 training_targets = np.mean(training_targets, axis=1)
 
-            # Arquivos para as features extraidas carregando o modelo em pytorch e usando d vgg do tf/keras
+            # Arquivos para as features extraidas carregando o modelo de vgg do pytorch e usando os pesos do tf/keras.
             if (FEATURES == 'torch_model_with_weights_of_tf/keras'):
-                training_frames = np.load(os.path.join(PATH_FEATURES_TF_KERAS + video_index +'_features.npy'))
+                training_frames = np.load(os.path.join(PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS + video_index +'_features.npy'))
+                training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
+                training_targets = np.mean(training_targets, axis=1)
+            
+            # Arquivos para as features extraidas carregando o modelo de vgg do tensorflow e usando os pesos do tf/keras.
+            if (FEATURES == 'tf_model_with_weights_of_tf/keras'):
+                training_frames = np.load(os.path.join(PATH_FEATURES_TF_MODEL_TF_KERAS_WEIGHTS + video_index +'_features.npy'))
                 training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
                 training_targets = np.mean(training_targets, axis=1)
 
             self.frames_list.append(training_frames)
             self.pressures_list.append(training_targets)
-            print(len(self.frames_list)) 
+             
             
         for video_index in self.frames_list:
             for frame_index in range(video_index.shape[0]):
