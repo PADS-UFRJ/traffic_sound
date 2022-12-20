@@ -34,7 +34,7 @@ PATH_FEATURES_CAROL = PATH_EXTRACTED_FEATURES+EXTRACTION_MODEL+'/'
 VIDEOS_NUMBER = 38
 PATH_FEATURES_FELIPE = '/home/felipevr/traffic_sound/dataset/preprocessed/features/vgg16/'
 PATH_TARGETS_FELIPE = '/home/felipevr/traffic_sound/dataset/preprocessed/targets/'
-PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS = '/home/caroline/traffic_sound/src/extraction/traffic_sound/dataset/preprocessed/features/'
+PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS = '/home/caroline/traffic_sound/src/extraction/traffic_sound/dataset/preprocessed/features_torch/'
 
 # Lista de vídeos
 videos_list = [
