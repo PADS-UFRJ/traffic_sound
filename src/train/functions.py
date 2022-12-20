@@ -22,7 +22,7 @@ from utils import *
 from Myfolds import *
 
 # Chama a gpu cuda disponível.Caso não tenha gpu disponível , usa a cpu
-device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda:3" if torch.cuda.is_available() else 'cpu')
 
 
 # Arquitetura da rede FC
