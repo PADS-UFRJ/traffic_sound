@@ -115,15 +115,22 @@ class LSTM_Dataset(Dataset):
                 training_targets = np.load('/home/mathlima/dataset/' + video_index +'/output_targets.npy')
                 training_targets = np.mean(training_targets, axis=1)
 
-             # Arquivos para as features extraidas carregando o modelo de vgg do pytorch e usando os pesos do tf/keras.
+             # Arquivos para as features extraidas carregando o modelo de vgg do pytorch e usando os pesos do tf/keras. (std = 1/255)
             if (FEATURES == 'torch_model_with_weights_of_tf/keras'):
                 training_frames = np.load(os.path.join(PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS + video_index +'_features.npy'))
                 training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
                 training_targets = np.mean(training_targets, axis=1)
             
-            # Arquivos para as features extraidas carregando o modelo de vgg do tensorflow e usando os pesos do tf/keras.
+            # Arquivos para as features extraidas carregando o modelo de vgg do tensorflow e usando os pesos do tf/keras. (std = 1/255)
             if (FEATURES == 'tf_model_with_weights_of_tf/keras'):
                 training_frames = np.load(os.path.join(PATH_FEATURES_TF_MODEL_TF_KERAS_WEIGHTS + video_index +'_features.npy'))
+                training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
+                training_targets = np.mean(training_targets, axis=1)
+
+            # Arquivos para as features extraidas carregando o modelo de vgg do tensorflow e usando os pesos do tf/keras.
+            # Passamos a calcular o desvio padrão durante a normalização (std = np.std())
+            if (FEATURES == 'tf_model_np_std_with_weights_of_tf/keras'):
+                training_frames = np.load(os.path.join(PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS_NP_STD + video_index +'_features.npy'))
                 training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
                 training_targets = np.mean(training_targets, axis=1)
 
@@ -317,6 +324,13 @@ class VGG_Dataset(Dataset):
                 training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
                 training_targets = np.mean(training_targets, axis=1)
 
+            # Arquivos para as features extraidas carregando o modelo de vgg do tensorflow e usando os pesos do tf/keras.
+            # Passamos a calcular o desvio padrão durante a normalização (std = np.std())
+            if (FEATURES == 'tf_model_np_std_with_weights_of_tf/keras'):
+                training_frames = np.load(os.path.join(PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS_NP_STD + video_index +'_features.npy'))
+                training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
+                training_targets = np.mean(training_targets, axis=1)
+            
             self.frames_list.append(training_frames)
             self.pressures_list.append(training_targets)
              
