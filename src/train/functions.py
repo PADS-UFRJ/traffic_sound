@@ -40,7 +40,7 @@ class LSTM_Network(nn.Module):
         self.bidirectional = option_bidirectional
         
         if self.bidirectional == True:
-           self.num_directions = 2
+            self.num_directions = 2
         else:
             self.num_directions = 1 
 
@@ -131,6 +131,13 @@ class LSTM_Dataset(Dataset):
             # Passamos a calcular o desvio padrão durante a normalização (std = np.std())
             if (FEATURES == 'tf_model_np_std_with_weights_of_tf/keras'):
                 training_frames = np.load(os.path.join(PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS_NP_STD + video_index +'_features.npy'))
+                training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
+                training_targets = np.mean(training_targets, axis=1)
+
+            # Arquivos para as features extraidas carregando o modelo de vgg do tensorflow e usando os pesos do tf/keras.
+            # Passamos a usar a função do Matheus Lima que combina as valores de média e desvio padrão(calculate_dataset_statistics() importada do arquivo 'dataset_build_MatheusLima.py').
+            if (FEATURES == 'tf_model_combined_mean_std_with_weights_of_tf/keras'):
+                training_frames = np.load(os.path.join(PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS_COMBINED_MEAN_STD + video_index +'_features.npy'))
                 training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
                 training_targets = np.mean(training_targets, axis=1)
 
@@ -331,9 +338,18 @@ class VGG_Dataset(Dataset):
                 training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
                 training_targets = np.mean(training_targets, axis=1)
             
-            self.frames_list.append(training_frames)
-            self.pressures_list.append(training_targets)
-             
+            # Arquivos para as features extraidas carregando o modelo de vgg do tensorflow e usando os pesos do tf/keras.
+            # Passamos a usar a função do Matheus Lima que combina as valores de média e desvio padrão.
+            if (FEATURES == 'tf_model_combined_mean_std_with_weights_of_tf/keras'):
+                training_frames = np.load(os.path.join(PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS_COMBINED_MEAN_STD + video_index +'_features.npy'))
+                training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
+                training_targets = np.mean(training_targets, axis=1)
+            
+            if not(FEATURES == 'Matheus'):
+                self.frames_list.append(training_frames)
+                self.pressures_list.append(training_targets)
+            else: 
+                self.pressures_list.append(training_targets)
             
         for video_index in self.frames_list:
             for frame_index in range(video_index.shape[0]):
@@ -360,9 +376,11 @@ class VGG_Dataset(Dataset):
 
         
         self.pressures_array = torch.from_numpy(self.pressures_array).float()
-
-
-        self.data_len = len(self.list_of_all_frames)  
+        if (FEATURES == 'Matheus'):
+            self.data_len = self.frames_array.shape[0]
+        else:
+            self.data_len = len(self.list_of_all_frames) 
+         
 
     def __getitem__(self, index): # indice do fold escolhido e modo de treino ou validação
         '''Retorna o item de número determinado pelo indice'''

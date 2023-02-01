@@ -1,6 +1,6 @@
 
 # Listas necessárias para a busca por parametros
-epochs = [100]
+epochs = [30]
 opt = ['adam']
 batch = [32]
 dropout = [0.5] # dropout 0 não dá certo !
@@ -12,11 +12,11 @@ NUMBER_STEPS_EPOCHS = 40
 lr_scheduler = [5e-6,1e-6,5e-7]
 
 # Constantes 
-LSTM = False
-FEATURES = 'tf_model_np_std_with_weights_of_tf/keras' # 'Felipe' ou 'Matheus' ou 'torch_model_with_weights_of_tf/keras' ou 'tf_model_with_weights_of_tf/keras' 
+LSTM = True
+FEATURES = 'Felipe' # 'Felipe' ou 'Matheus' ou 'torch_model_with_weights_of_tf/keras' ou 'tf_model_with_weights_of_tf/keras' ou'tf_model_np_std_with_weights_of_tf/keras'  ou 'tf_model_combined_mean_std_with_weights_of_tf/keras'
 size_windows = 32 
 num_layers = 1 # Número de camadas lstm empilhadas no modelo
-bidirectional = False
+bidirectional = True
 option_overlap = True
 option_causal = False
 
@@ -37,6 +37,7 @@ PATH_TARGETS_FELIPE = '/home/felipevr/traffic_sound/dataset/preprocessed/targets
 PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS = '/home/caroline/traffic_sound/src/extraction/traffic_sound/dataset/preprocessed/features_torch/'
 PATH_FEATURES_TF_MODEL_TF_KERAS_WEIGHTS = '/home/caroline/traffic_sound/src/extraction/traffic_sound/dataset/preprocessed/features_tensorflow/'
 PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS_NP_STD = '/home/caroline/traffic_sound/src/extraction/traffic_sound/dataset/preprocessed/features_np_std/'
+PATH_FEATURES_PYTORCH_MODEL_TF_KERAS_WEIGHTS_COMBINED_MEAN_STD = '/home/caroline/traffic_sound/src/extraction/traffic_sound/dataset/preprocessed/features_220123/'
 
 # Lista de vídeos
 videos_list = [
