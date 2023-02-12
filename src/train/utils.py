@@ -1,6 +1,6 @@
 
 # Listas necessárias para a busca por parametros
-epochs = [30]
+epochs = [100]
 opt = ['adam']
 batch = [32]
 dropout = [0.5] # dropout 0 não dá certo !
@@ -14,18 +14,18 @@ lr_scheduler = [5e-6,1e-6,5e-7]
 # Constantes 
 LSTM = True
 FEATURES = 'Felipe' # 'Felipe' ou 'Matheus' ou 'torch_model_with_weights_of_tf/keras' ou 'tf_model_with_weights_of_tf/keras' ou'tf_model_np_std_with_weights_of_tf/keras'  ou 'tf_model_combined_mean_std_with_weights_of_tf/keras'
-size_windows = 32 
-num_layers = 1 # Número de camadas lstm empilhadas no modelo
-bidirectional = True
-option_overlap = True
-option_causal = False
+SIZE_WINDOWS = 32 
+NUM_LAYERS = 1 # Número de camadas lstm empilhadas no modelo
+BIDIRECTIONAL =  False
+OPTION_OVERLAP =  True
+OPTION_CAUSAL = False
 
 OPTION_SHUFFLE = True
 OPTION_NUM_WORKERS = 3
 INPUT_SIZE_FEATURES = 512
 HIDDEN_SIZE = 128
 OUTPUT_SIZE_FEATURES = 1
-SEED_NUMBER = 22
+SEED_NUMBER = 51
 
 PATH_DATA_TO_EXTRACTION = '/home/caroline/traffic-analysis/dataset/' # Caminho dos dados usados para a extração
 PATH_EXTRACTED_FEATURES = '/home/caroline/Traffic-Pytorch/Data/Preprocessed/' # Caminho onde salvo as features e os targets  '

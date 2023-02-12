@@ -68,6 +68,7 @@ if __name__ == '__main__':
         history_file = open(file_path,'w+')
         history_file.write('\nDispositivo usado pelo Pytorch: {}\n'.format(device))
         history_file.write('\nFeatures usadas: {}\n'.format(FEATURES))
+        history_file.write('\nSeed number {}\n'.format(SEED_NUMBER))
         history_file.close()
 
         history_file = open(file_path,'a')
@@ -79,7 +80,7 @@ if __name__ == '__main__':
         if(LSTM == True):
             history_file = open(file_path,'a')
             history_file.write('\n LSTM ={}\n\n'.format(LSTM))
-            history_file.write('\n option_overlap={} , option_causal={} ,option_dropout_lstm={}\n\n'.format(option_overlap,option_causal,dropout_lstm_grid))
+            history_file.write('\n option_overlap={} , option_causal={} ,option_dropout_lstm={}\n\n'.format(OPTION_OVERLAP,OPTION_CAUSAL,dropout_lstm_grid))
             history_file.close()
 
         list_val_loss_min = []
@@ -104,9 +105,9 @@ if __name__ == '__main__':
                 train_dataset = LSTM_Dataset(folds,         # passamos o dicionário de folds
                                              fold_index,     # o indice do fold
                                              'train',        # o modo que queremos : 'train'
-                                             option_overlap, # se tem sobreposição de janelas ou não
-                                             option_causal,  # se é causal ou não
-                                             size_windows)   # o tamanho da janela                                                                                                                                                                                                                                                    
+                                             OPTION_OVERLAP, # se tem sobreposição de janelas ou não
+                                             OPTION_CAUSAL,  # se é causal ou não
+                                             SIZE_WINDOWS)   # o tamanho da janela                                                                                                                                                                                                                                                    
 
             else:
                 print("train dataset vgg")
@@ -131,12 +132,12 @@ if __name__ == '__main__':
             for index in range(len_train):
                 train_frame,train_pressure = train_dataset[index]
                 
-                if(LSTM == True) and (option_causal == False):
-                    train_frames_array.append(train_frame[size_windows//2 - 1])
+                if(LSTM == True) and (OPTION_CAUSAL == False):
+                    train_frames_array.append(train_frame[SIZE_WINDOWS//2 - 1])
                     train_frames_tensor.append(train_frame)
 
-                elif(LSTM == True) and (option_causal == True):
-                    train_frames_array.append(train_frame[size_windows - 1])
+                elif(LSTM == True) and (OPTION_CAUSAL == True):
+                    train_frames_array.append(train_frame[SIZE_WINDOWS - 1])
                     train_frames_tensor.append(train_frame)
                 else: # vgg !
                     train_frames_array.append(train_frame)
@@ -149,9 +150,9 @@ if __name__ == '__main__':
                 val_dataset = LSTM_Dataset( folds,         # passamos o dicionário de folds
                                             fold_index,     # o indice do fold
                                             'val',          # o modo que queremos : 'val'
-                                            option_overlap, # se tem sobreposição de janelas ou não
-                                            option_causal,  # se é causal ou não
-                                            size_windows)   # o tamanho da janela                                                                                                                                                                                                                                                    
+                                            OPTION_OVERLAP, # se tem sobreposição de janelas ou não
+                                            OPTION_CAUSAL,  # se é causal ou não
+                                            SIZE_WINDOWS)   # o tamanho da janela                                                                                                                                                                                                                                                    
             else:
                 print("val dataset vgg")
                 val_dataset = VGG_Dataset(folds,        # passamos o dicionário de folds
@@ -164,11 +165,11 @@ if __name__ == '__main__':
             for index in range(len_val):
                 val_frame,val_pressure = val_dataset[index] 
 
-                if(LSTM == True) and (option_causal == False):
-                    val_frames_array.append(val_frame[size_windows//2 - 1])
+                if(LSTM == True) and (OPTION_CAUSAL == False):
+                    val_frames_array.append(val_frame[SIZE_WINDOWS//2 - 1])
 
-                elif(LSTM == True) and (option_causal == True):
-                    val_frames_array.append(val_frame[size_windows - 1])
+                elif(LSTM == True) and (OPTION_CAUSAL == True):
+                    val_frames_array.append(val_frame[SIZE_WINDOWS - 1])
                 
                 else:
                     val_frames_array.append(val_frame)
@@ -184,7 +185,7 @@ if __name__ == '__main__':
 
             # Retornando o modelo 
             if(LSTM == True):
-                model = LSTM_Network(INPUT_SIZE_FEATURES,OUTPUT_SIZE_FEATURES,HIDDEN_SIZE,dropout_grid,num_layers,dropout_lstm_grid,bidirectional) 
+                model = LSTM_Network(INPUT_SIZE_FEATURES,OUTPUT_SIZE_FEATURES,HIDDEN_SIZE,dropout_grid,NUM_LAYERS,dropout_lstm_grid,BIDIRECTIONAL) 
             else:
                 model = VGG_Network(INPUT_SIZE_FEATURES,OUTPUT_SIZE_FEATURES,[128],dropout_grid)
             
@@ -197,7 +198,7 @@ if __name__ == '__main__':
 
 
             # Otimizador 
-            #optimizer = optimizer_config(optmizer_grid,model,lr_grid)
+            optimizer = optimizer_config(optmizer_grid,model,lr_grid)
 
             
             list_loss_train = []
@@ -215,7 +216,7 @@ if __name__ == '__main__':
 
 
             for epochs_index in range(epochs_grid):
-
+                """
                 # Otimizador
                 # Se SCHEDULER = True, temos a lr variando de acordocom as épocas. Não usei a função StepLR do pytorch, pois, neste caso, o gamma varia!
                 if (SCHEDULER):
@@ -234,13 +235,12 @@ if __name__ == '__main__':
                 else:
                     # Se SCHEDULER = False, temos um lr constante para todas as épocas.
                     optimizer = optimizer_config(optmizer_grid,model,lr_grid)     
-
+                """
 
                 train_loss = train(model,train_dataset,loss_function,optimizer,batch_grid)
                 
                 val_loss = validation(model,val_dataset,loss_function,training_results_path,fold_index,batch_grid)
                 
-
                 if min_val_loss > val_loss:
                     min_val_loss = val_loss
                     epoch_of_min_val_loss = epochs_index+1
