@@ -27,9 +27,9 @@ device = torch.device("cuda:3" if torch.cuda.is_available() else 'cpu')
 if __name__ == '__main__':
 
     if(LSTM == True):
-        permutation = list(itertools.product(epochs,opt,batch,dropout,lr,dropout_lstm))
+        permutation = list(itertools.product(epochs,opt,batch,dropout,lr,seed_number,dropout_lstm))
     else:
-        permutation = list(itertools.product(epochs,opt,batch,dropout,lr))
+        permutation = list(itertools.product(epochs,opt,batch,dropout,lr,seed_number))
     
     
     time_file = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
@@ -48,10 +48,12 @@ if __name__ == '__main__':
         batch_grid = df['hyperparameters'][2]
         dropout_grid = df['hyperparameters'][3]
         lr_grid = df['hyperparameters'][4]
+        seed_grid = df['hyperparameters'][5]
         if(LSTM == True):
-            dropout_lstm_grid = float(df['hyperparameters'][5])
+            dropout_lstm_grid = float(df['hyperparameters'][6])
             print(type(dropout_lstm_grid))
         
+
         training_results_path = os.path.join("results/",time_file+"/Grid_"+str(permutation_index)+"/")
         
         if not os.path.exists(training_results_path):
@@ -68,7 +70,7 @@ if __name__ == '__main__':
         history_file = open(file_path,'w+')
         history_file.write('\nDispositivo usado pelo Pytorch: {}\n'.format(device))
         history_file.write('\nFeatures usadas: {}\n'.format(FEATURES))
-        history_file.write('\nSeed number {}\n'.format(SEED_NUMBER))
+        history_file.write('\nSeed number {}\n'.format(seed_grid))
         history_file.close()
 
         history_file = open(file_path,'a')
@@ -80,6 +82,7 @@ if __name__ == '__main__':
         if(LSTM == True):
             history_file = open(file_path,'a')
             history_file.write('\n LSTM ={}\n\n'.format(LSTM))
+            history_file.write('\n BIDIRECTIONAL ={}\n\n'.format(BIDIRECTIONAL))
             history_file.write('\n option_overlap={} , option_causal={} ,option_dropout_lstm={}\n\n'.format(OPTION_OVERLAP,OPTION_CAUSAL,dropout_lstm_grid))
             history_file.close()
 
@@ -94,9 +97,9 @@ if __name__ == '__main__':
             history_file.close()
 
             # Setando a seed do pytorch,numpy e do python !
-            torch.manual_seed(SEED_NUMBER)
-            np.random.seed(SEED_NUMBER)
-            random.seed(SEED_NUMBER)
+            torch.manual_seed(seed_grid)
+            np.random.seed(seed_grid)
+            random.seed(seed_grid)
             
             # Dados de treino 
 
@@ -314,7 +317,11 @@ if __name__ == '__main__':
             
             val_pressures_array = np.array(val_pressures_array,dtype= 'float64')
             val_pressures_array = np.squeeze(val_pressures_array)
-
+            """
+            if BIDIRECTIONAL:
+                val_pressures_array = np.concatenate((val_pressures_array,val_pressures_array))
+                print(val_pressures_array.shape)
+            """
             # Calculando a correlação
             correlation = pearsonr(val_pressures_array ,list_of_all_predictions)
             
