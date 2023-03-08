@@ -20,9 +20,10 @@ from torch.autograd import Variable
 
 from utils import *
 from Myfolds import *
+import tikzplotlib
 
 # Chama a gpu cuda disponível.Caso não tenha gpu disponível , usa a cpu
-device = torch.device("cuda:3" if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda:1" if torch.cuda.is_available() else 'cpu')
 
 
 # Arquitetura da rede FC
@@ -44,8 +45,8 @@ class LSTM_Network(nn.Module):
         else:
             self.num_directions = 1 
 
-        self.dense_hidden = nn.Linear(self.hidden_size, self.hidden_size)
-        self.dense = nn.Linear(self.hidden_size, self.output_size)
+        self.dense_hidden = nn.Linear(self.hidden_size*self.num_directions, self.hidden_size*self.num_directions)
+        self.dense = nn.Linear(self.hidden_size*self.num_directions, self.output_size)
         self.dropout_linear_layer = nn.Dropout(self.dropout_value)
         self.dropout_lstm_layer = nn.Dropout(self.dropout_value_lstm)
         self.lstm = nn.LSTM(self.input_size,
@@ -57,7 +58,6 @@ class LSTM_Network(nn.Module):
 
     def forward(self, x):
         x = self.dropout_lstm_layer(x)
-
         # Inicializando os estados ocultos com tensores preenchidos por 0  
         h_0 = Variable(torch.zeros(self.num_layers*self.num_directions, x.size(0), self.hidden_size)) # hidden state
         c_0 = Variable(torch.zeros(self.num_layers*self.num_directions, x.size(0), self.hidden_size)) # internal state
@@ -70,16 +70,17 @@ class LSTM_Network(nn.Module):
         # (hn, cn) = tensor com os últimos estados da camada lstm
 
         output, (hn, cn) = self.lstm(x, (h_0, c_0)) # shape de hn -> [1,32,128]
-        #print(hn.shape) 
-
-        # Remodelando os dados para pode usar na camada dense 
-        hn = hn.view(-1, self.hidden_size) # shape de hn -> [32,128]
-        #print(hn.shape)
+        
+        
+        if BIDIRECTIONAL:
+            hn = torch.cat((hn[0,:,:],hn[1,:,:]),1)
+        else:
+            # Remodelando os dados para pode usar na camada dense 
+            hn = hn.view(-1, self.hidden_size) # shape de hn -> [32,128]
 
         x = torch.tanh(self.dense_hidden(hn))
         x = self.dropout_linear_layer(x)
         x = self.dense(x)
-        #print(x)
         return x     
 
 
@@ -108,8 +109,11 @@ class LSTM_Dataset(Dataset):
             if (FEATURES == 'Felipe'):
                 training_frames = np.load(os.path.join(PATH_FEATURES_FELIPE + video_index +'_features.npy'))
                 training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
+                print(video_index)
                 training_targets = np.mean(training_targets, axis=1)
-
+                print(training_targets.shape)
+                print(PATH_FEATURES_FELIPE)
+                exit()
             # Arquivo para o uso dos targets do matheus
             if (FEATURES == 'Matheus'):
                 training_targets = np.load('/home/mathlima/dataset/' + video_index +'/output_targets.npy')
@@ -405,10 +409,23 @@ def train(model,train_dataset,loss_function,optimizer,batch_grid):
         
         pressure_aux = pressure 
         pressures = pressure_aux[:,None]
+        """
+        if BIDIRECTIONAL:
+            pressures = pressures.cpu().numpy()
+            #x = np.flip(pressures)
+            #pressures = np.vstack((pressures,x))
+            pressures = np.vstack((pressures,pressures))
+            
+            pressures = torch.from_numpy(pressures).float()
+        """
         
         # Passando os dados para o modelo para obter as predições
         pred = model(frames)
-
+        """
+        if BIDIRECTIONAL:
+            pred=pred.to(device)
+            pressures=pressures.to(device)
+        """
         # Calculando a perda através da função de perda
         loss = loss_function(pred,pressures)
 
@@ -440,13 +457,25 @@ def validation(model,val_dataset,loss_function,path,fold_index,batch_grid):
             frames, pressure = frames.to(device), pressure.to(device)
             
             pressure_aux = pressure
-            pressure = pressure_aux[:,None]
+            pressures = pressure_aux[:,None]
+            """
+            if BIDIRECTIONAL:
+                pressures = pressures.cpu().numpy()
+                #x = np.flip(pressures)
+                #pressures = np.vstack((pressures,x))
+                pressures = np.vstack((pressures,pressures))
+                pressures = torch.from_numpy(pressures).float()
+            """
             
             # Passando os dados para o modelo para obter as predições
             pred = model(frames)
-
+            """
+            if BIDIRECTIONAL:
+                pred=pred.to(device)
+                pressures=pressures.to(device)
+            """
             # Calculando a perda através da função de perda
-            loss = loss_function(pred,pressure)
+            loss = loss_function(pred,pressures)
 
             val_loss += frames.size(0) * loss.item()
 
@@ -483,6 +512,7 @@ def graphic_of_training(df_train,df_val,fold_index,path,epochs_number):
     plt.ylabel('Loss')
     plt.grid()
     plt.savefig(path+'Loss_plot-Fold_'+str(fold_index)+'.png')
+    #tikzplotlib.save(path+'Loss_plot-Fold'+str(fold_index)+'.tikz')
     plt.clf()
 
 # Função que plota gráfico com a curva de treino de todos os folds 
@@ -508,16 +538,18 @@ def graphic_of_training_all_folds(df_train_all_folds,df_val_all_folds,path,epoch
     plt.ylabel('Loss')
     plt.grid()
     plt.savefig(path+'Loss_plot-All_Folds.png')
+    #tikzplotlib.save(path+'Loss_plot-All_Folds.tikz')
     plt.clf()
 
 # Função que plota gráfico de predição de um fold  
 def graphic_of_fold_predictions(df_pressures,df_prediction,fold_index,path):
     df_pressures.plot(color='orange',alpha=1.0,ax=plt.gca())
     df_prediction.plot(color='blue',alpha=0.5,ax=plt.gca())
-    plt.title('Predicition-Fold_'+str(fold_index))
+    plt.title('Prediction-Fold_'+str(fold_index))
     plt.xlabel('Time[s]')
     plt.ylabel('Amplitude')
-    plt.savefig(path+'Predicition-Fold_'+str(fold_index)+'.png')
+    plt.savefig(path+'Prediction-Fold_'+str(fold_index)+'.png')
+    #tikzplotlib.save(path+'PredictionFold'+str(fold_index)+'.tikz')
     plt.clf()
 
 # Função que plota gráfico de predição de cada video  
@@ -527,10 +559,11 @@ def graphic_of_video_predictions(df_pressures,df_prediction,fold_index,video_ind
         os.makedirs(predict_path)
     df_pressures.plot(color='orange',alpha=1.0,ax=plt.gca())
     df_prediction.plot(color='blue',alpha=0.5,ax=plt.gca())
-    plt.title('Predicition-Fold_'+str(fold_index))
+    plt.title('Prediction-Fold_'+str(fold_index))
     plt.xlabel('Time[s]')
     plt.ylabel('Amplitude')
-    plt.savefig(predict_path+'Predicition-Fold_'+str(fold_index)+'-'+video_index+'.png')
+    plt.savefig(predict_path+'Prediction-Fold_'+str(fold_index)+'-'+video_index+'.png')
+    #tikzplotlib.save(predict_path+'Prediction-Fold_'+str(fold_index)+'-'+video_index+'.tikz')
     plt.clf()
 
 # Função que plota gráfico de predição de cada fold  
@@ -540,10 +573,11 @@ def graphic_of_fold_predictions(df_pressures,df_prediction,fold_index,path):
         os.makedirs(predict_path)
     df_pressures.plot(color='orange',alpha=1.0,ax=plt.gca())
     df_prediction.plot(color='blue',alpha=0.5,ax=plt.gca())
-    plt.title('Predicition-Fold_'+str(fold_index))
+    plt.title('Prediction-Fold_'+str(fold_index))
     plt.xlabel('Time[s]')
     plt.ylabel('Amplitude')
-    plt.savefig(predict_path+'Predicition-Fold_'+str(fold_index)+'.png')
+    plt.savefig(predict_path+'Prediction-Fold_'+str(fold_index)+'.png')
+    #tikzplotlib.save(predict_path+'Predicition-Fold_'+str(fold_index)+'.tikz')
     plt.clf()
 
 # Função que salva o estado dos códigos no início do treino
