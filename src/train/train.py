@@ -21,7 +21,7 @@ from Myfolds import *
 from functions import *
 
 # Chama a gpu cuda disponível.Caso não tenha gpu disponível , usa a cpu
-device = torch.device("cuda:3" if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda:1" if torch.cuda.is_available() else 'cpu')
 
 
 if __name__ == '__main__':
@@ -30,14 +30,16 @@ if __name__ == '__main__':
         permutation = list(itertools.product(epochs,opt,batch,dropout,lr,seed_number,dropout_lstm))
     else:
         permutation = list(itertools.product(epochs,opt,batch,dropout,lr,seed_number))
-    
+     
     
     time_file = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
 
     file_name = 'Training_report-'+ time_file     
 
+    list_best_min_loss_val_in_grid = []
     train_list = pd.DataFrame()
     val_list = pd.DataFrame()
+    min_val_list = pd.DataFrame()
 
     # Loop do Grid Search
     for permutation_index in range(len(permutation)):
@@ -207,7 +209,7 @@ if __name__ == '__main__':
             list_loss_train = []
             list_loss_val = []
             list_predictions = []
-            list_of_all_predictions = []
+            list_of_all_predictions = [] 
             min_val_loss = np.inf
 
             begin = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -264,6 +266,7 @@ if __name__ == '__main__':
             train_loss_min = df_train['train_loss'].values.min()
 
             df_val = pd.DataFrame(list_loss_val, columns = ['val_loss'])
+            
             val_loss_min = df_val['val_loss'].values.min()
             list_val_loss_min.append(val_loss_min)
 
@@ -277,6 +280,7 @@ if __name__ == '__main__':
 
             graphic_of_training(df_train,df_val,fold_index,training_files_path,epochs_grid)
         
+            
             history_file = open(file_path,'a')
             history_file.write('\nEnd of training: {}\n'.format(end))
             history_file.write('\nLoss min training: {}\n'.format(train_loss_min))
@@ -369,21 +373,39 @@ if __name__ == '__main__':
                                                 predict_files_path_vgg)
                     begin_index = auxiliary
 
-
                     
             # Curva de treino de todos os folds
 
             # Adicionando os dados de treino e validação nos data frames 
             val_list.loc[:,'val_loss_'+str(fold_index)]=df_val['val_loss']
             train_list.loc[:,'train_loss_'+str(fold_index)]=df_train['train_loss']
-            
+        
+
+        # Adicionando a menor loss de validação de cada fold no data frame   
+        min_val_list.loc[:,'g_'+str(permutation_index)+'-val_loss']=list_val_loss_min
+
+
         # Plotando a curva de treino de todos os folds
         graphic_of_training_all_folds(train_list,val_list,training_files_path,epochs_grid) 
-            
+        
+
+        # Lista com a média das melhores losses de validação de cada fold. 
+        list_best_min_loss_val_in_grid.append(sum(list_val_loss_min)/len(list_val_loss_min))
+
         history_file = open(file_path,'a')
         history_file.write('\n\nMean validation loss: {}\n'.format(sum(list_val_loss_min)/len(list_val_loss_min)))
         history_file.close()      
+    
+    # Adicionando ao data frame a lista da média das melhores losses de validação de cada fold.
+    min_val_list.loc['mean']= list_best_min_loss_val_in_grid
+    
+    training_path = os.path.join("results/",time_file+"/")
+        
+    if not os.path.exists(training_path):
+        os.makedirs(training_path)
 
+    min_val_list.to_csv(training_path+"Validation_data.csv")
+            
             
 
 
