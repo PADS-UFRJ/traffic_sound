@@ -23,7 +23,7 @@ from Myfolds import *
 import tikzplotlib
 
 # Chama a gpu cuda disponível.Caso não tenha gpu disponível , usa a cpu
-device = torch.device("cuda:1" if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
 
 
 # Arquitetura da rede FC
@@ -71,13 +71,15 @@ class LSTM_Network(nn.Module):
 
         output, (hn, cn) = self.lstm(x, (h_0, c_0)) # shape de hn -> [1,32,128]
         
-        
+        # Comentei esse if abaixo para o treino ficar mais rápido
+        """ 
         if BIDIRECTIONAL:
             hn = torch.cat((hn[0,:,:],hn[1,:,:]),1)
         else:
             # Remodelando os dados para pode usar na camada dense 
             hn = hn.view(-1, self.hidden_size) # shape de hn -> [32,128]
-
+        """
+        hn = hn.view(-1, self.hidden_size) # shape de hn -> [32,128]
         x = torch.tanh(self.dense_hidden(hn))
         x = self.dropout_linear_layer(x)
         x = self.dense(x)
@@ -109,11 +111,8 @@ class LSTM_Dataset(Dataset):
             if (FEATURES == 'Felipe'):
                 training_frames = np.load(os.path.join(PATH_FEATURES_FELIPE + video_index +'_features.npy'))
                 training_targets = np.load(os.path.join(PATH_TARGETS_FELIPE + video_index +'_targets.npy'))
-                print(video_index)
                 training_targets = np.mean(training_targets, axis=1)
-                print(training_targets.shape)
-                print(PATH_FEATURES_FELIPE)
-                exit()
+
             # Arquivo para o uso dos targets do matheus
             if (FEATURES == 'Matheus'):
                 training_targets = np.load('/home/mathlima/dataset/' + video_index +'/output_targets.npy')
@@ -265,7 +264,6 @@ class VGG_Network(nn.Module):
 
     def __init__(self, input_size, output_size, hidden_layers_size_list,dropout_value):
         super(VGG_Network, self).__init__()
-
         self.input_size = input_size
         self.output_size = output_size
         self.hidden_layers_size_list = hidden_layers_size_list
@@ -586,6 +584,10 @@ def save_current_version_of_codes(time_file):
     source_train = os.getcwd() + "/train.py"
     destination_train = os.getcwd()+"/results/"+time_file+"/train.py"
     
+    if not PYTORCH:
+        source_train = os.getcwd() + "/train_tf.py"
+        destination_train = os.getcwd()+"/results/"+time_file+"/train_tf.py"
+    
     source_utils = os.getcwd()+"/utils.py"
     destination_utils = os.getcwd()+"/results/"+time_file+"/utils.py"
 
@@ -599,4 +601,4 @@ def save_current_version_of_codes(time_file):
     os.system('mv '+destination_train+' '+os.getcwd()+"/results/"+time_file+"/train-"+time_file+".py")
     os.system('mv '+destination_utils+' '+os.getcwd()+"/results/"+time_file+"/utils-"+time_file+".py")
     os.system('mv '+destination_functions+' '+os.getcwd()+"/results/"+time_file+"/functions-"+time_file+".py")
-
+        
