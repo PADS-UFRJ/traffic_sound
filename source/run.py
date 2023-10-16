@@ -14,7 +14,7 @@ from torch.utils.data import DataLoader, Dataset
 
 import const
 from folds import folds as folds_list
-from dataset_classes import FeaturesDataset, AudioTargetDataset, FeaturesAndTargetsUnionDataset
+from dataset_classes import FeaturesDataset, AudioTargetDataset, FeaturesAndTargetsUnionDataset, LSTM_Dataset
 from models import FCNetwork
 from models import ModelFromDict
 
@@ -40,7 +40,7 @@ parser.add_argument('-d', '--date', default='today')
 
 ###############################################################################
 
-def parse_model_config(model_json, hyperparams):
+def parse_model_config(model_json, hyperparams: dict):
 
     with open(model_json) as json_file:
         model_config = json.load(json_file)
@@ -48,13 +48,19 @@ def parse_model_config(model_json, hyperparams):
     layers_dict = model_config['layers']
     # [TODO] colocar opcao de outros extratores de feature
     layers_dict['feature_extractor'] = {
-                                        'model': layers_dict['feature_extractor'],
-                                        'offline': True if ('features_offline' not in hyperparams) \
-                                                    else hyperparams['features_offline']
-                                    }
+        'model': layers_dict['feature_extractor'],
+        'offline': hyperparams.get('features_offline', True)
+    }
 
-    layers_dict['fc_network']['dropout_value'] = None if ('fc_dropout' not in hyperparams) \
-                                                else hyperparams['fc_dropout']
+    if 'fc_network' in layers_dict:
+        layers_dict['fc_network']['dropout_value'] = hyperparams.get('fc_dropout')
+
+    if 'lstm_network' in layers_dict:
+        layers_dict['lstm_network'].update({
+            'device': device,
+            'fc_dropout': hyperparams.get('fc_dropout'),
+            'lstm_dropout': hyperparams.get('lstm_dropout'),
+        })
 
     return model_config
 
@@ -80,10 +86,11 @@ def parse_hyperparams(hyperparams_json):
     optimizer  = hyperparams['optimizer']  if isinstance(hyperparams['optimizer'] , list) else [ hyperparams['optimizer'] ]
     batch_size = hyperparams['batch_size'] if isinstance(hyperparams['batch_size'], list) else [ hyperparams['batch_size'] ]
     fc_dropout = hyperparams['fc_dropout'] if isinstance(hyperparams['fc_dropout'], list) else [ hyperparams['fc_dropout'] ] # dropout 0 não dá certo !
+    lstm_dropout = hyperparams['lstm_dropout'] if isinstance(hyperparams.get('lstm_dropout'), list) else [ hyperparams.get('lstm_dropout') ] # dropout 0 não dá certo !
     lr         = hyperparams['lr']         if isinstance(hyperparams['lr']        , list) else [ hyperparams['lr'] ]
 
-    permutation = list(itertools.product(epochs, optimizer, batch_size, fc_dropout, lr))
-    permutation = pd.DataFrame(permutation, columns=['epochs', 'optimizer', 'batch_size', 'fc_dropout', 'lr'])
+    permutation = list(itertools.product(epochs, optimizer, batch_size, fc_dropout, lstm_dropout, lr))
+    permutation = pd.DataFrame(permutation, columns=['epochs', 'optimizer', 'batch_size', 'fc_dropout', 'lstm_dropout', 'lr'])
 
     return permutation
 
@@ -150,7 +157,7 @@ if __name__ == '__main__':
             copy(args.model, json_path)
 
         # Loop de treino para os 10 folds
-        for fold in folds_list[:2]:
+        for fold in folds_list:
             print(f'----> Fold {fold["index"]}')
 
             torch.manual_seed(22)
@@ -186,7 +193,10 @@ if __name__ == '__main__':
                 targets_datasets[mode] = AudioTargetDataset(targets_files[mode]) # O dataset que retorna os targets de acordo com a lista de arquivos
 
                 # O dataset que une features e targets para serem retornados em uma tupla
-                full_datasets[mode] = FeaturesAndTargetsUnionDataset(features_datasets[mode], targets_datasets[mode])
+                if 'model_61' in model.name:
+                    full_datasets[mode] = LSTM_Dataset(features_datasets[mode], targets_datasets[mode], overlap=True, causal=False, n_steps=32)
+                else:
+                    full_datasets[mode] = FeaturesAndTargetsUnionDataset(features_datasets[mode], targets_datasets[mode])
 
                 # [NOTE] por algum motivo, o batch_size era passado como numpy.int64 e o DataLoader nao aceitava
                 dataloaders[mode] = DataLoader(full_datasets[mode], batch_size=int(hyperparams['batch_size']), shuffle=True )
@@ -205,13 +215,6 @@ if __name__ == '__main__':
                 train_loss = train(model, dataloaders['train'], loss_function, optimizer, device)
 
                 train_loss_list.append(train_loss)
-
-                model.eval()
-                with torch.no_grad():
-                    features = torch.from_numpy(features_datasets['train'][0]).to(device)
-                    pred = model(features)
-                    print(f"features_datasets['train'][0][0]: {features[0]}")
-                    print(f'pred: {pred.item()}')
 
                 test_loss = test(model, dataloaders['test'], loss_function, device)
 
@@ -249,8 +252,8 @@ if __name__ == '__main__':
             plt.legend()
             plt.savefig( os.path.join(RESULTS_DIR, 'plots', fold["name"] + '_plot.png') )
 
-            results_df[ fold['name'] + '_trn'] = results_df[ fold['name'] + '_trn'].round(4)
-            results_df[ fold['name'] + '_val'] = results_df[ fold['name'] + '_val'].round(4)
+            # results_df[ fold['name'] + '_trn'] = results_df[ fold['name'] + '_trn'].round(8)
+            # results_df[ fold['name'] + '_val'] = results_df[ fold['name'] + '_val'].round(8)
             results_df[ fold['name'] + '_time'] = results_df[ fold['name'] + '_time'].round(3)
 
             # Salvando os resultados de todos os folds

@@ -1,0 +1,13 @@
+{
+    "name": "model_61_COR6k_subset50",
+    "layers": {
+        "feature_extractor": "vggCOR6k_subset50",
+        "lstm_network": {
+            "input_size": 512,
+            "hidden_size": 128,
+            "lstm_num_layers": 1,
+            "output_size": 1,
+            "bidirectional": false
+        }
+    }
+}

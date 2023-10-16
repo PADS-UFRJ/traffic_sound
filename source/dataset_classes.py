@@ -1,6 +1,7 @@
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset, DataLoader
+import torch
 
 import numpy as np
 import cv2
@@ -166,7 +167,7 @@ class AudioTargetDataset(Dataset):
 
         # print(f'targets list len: {len(self.targets)}')
 
-        self.targets = np.array(self.targets)
+        self.targets = np.array(self.targets).mean(axis=1)
 
         # print(f'targets array shape: {self.targets.shape}')
 
@@ -175,7 +176,7 @@ class AudioTargetDataset(Dataset):
 
     def __getitem__(self, index):
 
-        target = self.targets[index].mean()
+        target = self.targets[index]
 
         if self.transform is not None:
             target = self.transform(target)
@@ -187,6 +188,9 @@ class AudioTargetDataset(Dataset):
     def __len__(self):
 
         return len(self.targets)
+
+    def to_numpy(self):
+        return self.targets
 
 
 ################################################################
@@ -228,6 +232,57 @@ class FeaturesAndTargetsUnionDataset(Dataset):
 
 ################################################################
 
+# Dataset Lstm
+class LSTM_Dataset(Dataset):
+    '''Classe que representa nosso dataset. Deve herdar da classe Dataset, em torch.utils.data
+    '''
+
+    def __init__(self, features_dataset, targets_dataset, overlap, causal, n_steps):
+        '''Define os valores iniciais.'''
+
+        self.frames_array = torch.from_numpy(features_dataset[:]).float()
+        self.pressures_array = torch.from_numpy(targets_dataset[:]).float()
+
+        X = []
+        y = []
+
+        for i in range(len(targets_dataset)):
+
+            end_ix = i + n_steps
+        
+            if end_ix > len(self.pressures_array)-1:
+                break
+
+            seq_x = self.frames_array[i:end_ix]
+
+            # Com sobreposição de janelas e de forma causal
+            if (overlap == True) and (causal == True):
+                seq_y = self.pressures_array[end_ix-1]
+
+            # Com sobreposição de janelas e não causal
+            if (overlap == True) and (causal == False):
+                target_index = i + (n_steps//2 - 1)
+                seq_y = self.pressures_array[target_index]
+
+            X.append(seq_x)
+            y.append(seq_y)
+        
+        self.frames_array = X
+        self.pressures_array = y
+        self.len = len(self.frames_array)
+         
+
+    def __getitem__(self, index):
+        # indice da janela escolhida e do target correspondente a janela
+        '''Retorna o item de número determinado pelo indice'''
+        return self.frames_array[index], self.pressures_array[index]
+
+    def __len__(self):
+        '''Número total de amostras'''
+        # Retorno o numero de janelas
+        return self.len
+
+################################################################
 
 # # Dataset  que retorna a tupla (frames,pressoes) de 1 fold
 # class Folds_Dataset(Dataset):
