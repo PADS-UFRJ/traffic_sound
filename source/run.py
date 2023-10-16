@@ -19,7 +19,7 @@ from models import FCNetwork
 from models import ModelFromDict
 
 from train import train
-from test import test
+from validation import test
 
 import argparse
 import json
