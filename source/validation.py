@@ -1,13 +1,13 @@
 import numpy as np
 import torch
 
-# Função de teste 
-def test(model, dataloader, loss_function, device):
+# Função de validacao 
+def validate(model, dataloader, loss_function, device):
 
     model.eval()
 
-    test_loss = 0.0
-    min_test_loss = np.inf
+    val_loss = 0.0
+    min_val_loss = np.inf
 
     with torch.no_grad():
         for frames, pressure in dataloader:
@@ -23,14 +23,14 @@ def test(model, dataloader, loss_function, device):
             # Calculando a perda através da função de perda
             loss = loss_function(pred, pressure)
 
-            test_loss += loss.item()
+            val_loss += loss.item()
 
-            # if min_test_loss > test_loss:
-            #     #print(f'Validation Loss Decreased({min_test_loss:.6f}--->{test_loss:.6f}) \t Saving The Model')
-            #     min_test_loss = test_loss
+            # if min_val_loss > val_loss:
+            #     #print(f'Validation Loss Decreased({min_val_loss:.6f}--->{val_loss:.6f}) \t Saving The Model')
+            #     min_val_loss = val_loss
         
             #     if savedir is not None:
             #         # Salvando o modelo 
             #         torch.save(model.state_dict(), 'saved_model.pth')
 
-        return test_loss / len(dataloader)
+        return val_loss / len(dataloader)

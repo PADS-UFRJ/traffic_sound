@@ -16,7 +16,7 @@ for idx in range(folds_number):
 #     'M2U00002MPG',
 #     'M2U00005MPG',
 # ]
-# folds[0]['test'] = [
+# folds[0]['val'] = [
 #     'M2U00003MPG',
 #     'M2U00006MPG',
 # ]
@@ -26,7 +26,7 @@ for idx in range(folds_number):
 #     'M2U00003MPG',
 #     'M2U00006MPG',
 # ]
-# folds[6]['test'] = [
+# folds[6]['val'] = [
 #     'M2U00008MPG',
 # ]
 
@@ -67,7 +67,7 @@ for idx in range(folds_number):
 #     'M2U00050MPG',
 # ]
 
-# folds[0]['test'] = [
+# folds[0]['val'] = [
 #     'M2U00001MPG',
 #     'M2U00002MPG',
 #     'M2U00003MPG',
@@ -114,7 +114,7 @@ folds[0]["train"] = [
     "M2U00050MPG"
 ]
 
-folds[0]["test"] = [
+folds[0]["val"] = [
     "M2U00001MPG",
     "M2U00002MPG",
     "M2U00003MPG",
@@ -161,7 +161,7 @@ folds[1]["train"] = [
     "M2U00050MPG"
 ]
 
-folds[1]["test"] = [
+folds[1]["val"] = [
     "M2U00004MPG",
     "M2U00007MPG",
     "M2U00017MPG",
@@ -205,7 +205,7 @@ folds[2]["train"] = [
     "M2U00050MPG"
 ]
 
-folds[2]["test"] = [
+folds[2]["val"] = [
     "M2U00004MPG",
     "M2U00005MPG",
     "M2U00006MPG",
@@ -251,7 +251,7 @@ folds[3]["train"] = [
     "M2U00050MPG"
 ]
 
-folds[3]["test"] = [
+folds[3]["val"] = [
     "M2U00014MPG",
     "M2U00018MPG",
     "M2U00024MPG",
@@ -296,7 +296,7 @@ folds[4]["train"] = [
     "M2U00046MPG",
     "M2U00047MPG"
 ]
-folds[4]["test"] = [
+folds[4]["val"] = [
     "M2U00003MPG",
     "M2U00008MPG",
     "M2U00012MPG",
@@ -340,7 +340,7 @@ folds[5]["train"] = [
     "M2U00050MPG"
 ]
 
-folds[5]["test"] = [
+folds[5]["val"] = [
     "M2U00005MPG",
     "M2U00006MPG",
     "M2U00007MPG",
@@ -385,7 +385,7 @@ folds[6]["train"] = [
     "M2U00050MPG"
 ]
 
-folds[6]["test"] = [
+folds[6]["val"] = [
     "M2U00012MPG",
     "M2U00014MPG",
     "M2U00017MPG",
@@ -429,7 +429,7 @@ folds[7]["train"] = [
     "M2U00050MPG"
 ]
 
-folds[7]["test"] = [
+folds[7]["val"] = [
     "M2U00003MPG",
     "M2U00012MPG",
     "M2U00015MPG",
@@ -475,7 +475,7 @@ folds[8]["train"] = [
     "M2U00050MPG"
 ]
 
-folds[8]["test"] = [
+folds[8]["val"] = [
     "M2U00001MPG",
     "M2U00002MPG",
     "M2U00004MPG",
@@ -523,7 +523,7 @@ folds[9]["train"] = [
     "M2U00050MPG"
 ]
 
-folds[9]["test"] = [
+folds[9]["val"] = [
     "M2U00002MPG",
     "M2U00003MPG",
     "M2U00007MPG",

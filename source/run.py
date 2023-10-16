@@ -19,7 +19,7 @@ from models import FCNetwork
 from models import ModelFromDict
 
 from train import train
-from validation import test
+from validation import validate
 
 import argparse
 import json
@@ -164,18 +164,18 @@ if __name__ == '__main__':
             np.random.seed(22)
             model.reset_parameters()
 
-            # Inicializando dicionarios vazios. A chave indica se o elemento retornado eh usado no treino ou no teste
-            features_files = {'train': None, 'test': None}
-            targets_files = {'train': None, 'test': None}
+            # Inicializando dicionarios vazios. A chave indica se o elemento retornado eh usado no treino ou na validacao
+            features_files = {'train': None, 'val': None}
+            targets_files = {'train': None, 'val': None}
 
-            features_datasets = {'train': None, 'test': None}
-            targets_datasets = {'train': None, 'test': None}
+            features_datasets = {'train': None, 'val': None}
+            targets_datasets = {'train': None, 'val': None}
 
-            full_datasets = {'train': None, 'test': None}
+            full_datasets = {'train': None, 'val': None}
 
-            dataloaders = {'train': None, 'test': None}
+            dataloaders = {'train': None, 'val': None}
 
-            for mode in ['train', 'test']:
+            for mode in ['train', 'val']:
 
                 features_files[mode] = [] # Lista de todos os arquivos de features correspondentes ao fold
                 targets_files[mode] = [] # Lista de todos os arquivos de targets correspondentes ao fold
@@ -202,9 +202,9 @@ if __name__ == '__main__':
                 dataloaders[mode] = DataLoader(full_datasets[mode], batch_size=int(hyperparams['batch_size']), shuffle=True )
 
             train_loss_list = []
-            test_loss_list = []
+            val_loss_list = []
             time_list = []
-            min_test_loss = np.inf
+            min_val_loss = np.inf
 
             print('Iniciando treino')
 
@@ -216,9 +216,9 @@ if __name__ == '__main__':
 
                 train_loss_list.append(train_loss)
 
-                test_loss = test(model, dataloaders['test'], loss_function, device)
+                val_loss = validate(model, dataloaders['val'], loss_function, device)
 
-                test_loss_list.append(test_loss)
+                val_loss_list.append(val_loss)
 
                 end = time.time()
 
@@ -227,25 +227,25 @@ if __name__ == '__main__':
                 # Salvando o modelo de melhor loss
                 # checkpoint_save_path = os.path.join(RESULTS_DIR, fold['name'] + '_checkpoint.pth')
                 checkpoint_save_path = os.path.join(RESULTS_DIR, 'checkpoints', fold['name'] + '_checkpoint.pth')
-                if test_loss < min_test_loss:
-                    min_test_loss = test_loss
+                if val_loss < min_val_loss:
+                    min_val_loss = val_loss
                     torch.save(model.state_dict(), checkpoint_save_path)
 
-                print(f'Epoch: {epochs_index+1}\t Train Loss: {round(train_loss,4)} \t Test Loss: {round(test_loss,4)} \t (Best: {round(min_test_loss,4)}) \t [{round(time_list[-1], 1)}s]')
+                print(f'Epoch: {epochs_index+1}\t Train Loss: {round(train_loss,4)} \t Val Loss: {round(val_loss,4)} \t (Best: {round(min_val_loss,4)}) \t [{round(time_list[-1], 1)}s]')
 
 
             model_save_path = os.path.join(RESULTS_DIR, 'model_params', fold['name'] + '_model.pth')
             torch.save(model.state_dict(), model_save_path)
 
             results_df[ fold['name'] + '_trn'] = train_loss_list
-            results_df[ fold['name'] + '_val'] = test_loss_list
+            results_df[ fold['name'] + '_val'] = val_loss_list
             results_df[ fold['name'] + '_time'] = time_list
             val_min = results_df[ fold['name'] + '_val'].min()
 
 
             plt.clf()
             plt.plot(train_loss_list, label='trn', color=const.colors[0])
-            plt.plot(test_loss_list, label='val', color=const.colors[1])
+            plt.plot(val_loss_list, label='val', color=const.colors[1])
             plt.axhline(y=val_min, color='r', linestyle='--')
             plt.ylim(bottom=0, top=3)
             plt.title(model.name+'/'+fold['name'])
