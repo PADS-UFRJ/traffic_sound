@@ -13,7 +13,7 @@ from torch import nn
 from torch.utils.data import DataLoader, Dataset
 
 import const
-from folds import folds as folds_list
+from folds import folds as folds_sets
 from dataset_classes import FeaturesDataset, AudioTargetDataset, FeaturesAndTargetsUnionDataset, LSTM_Dataset
 from models import FCNetwork
 from models import ModelFromDict
@@ -89,10 +89,16 @@ def parse_hyperparams(hyperparams_json):
     lstm_dropout = hyperparams['lstm_dropout'] if isinstance(hyperparams.get('lstm_dropout'), list) else [ hyperparams.get('lstm_dropout') ] # dropout 0 não dá certo !
     lr         = hyperparams['lr']         if isinstance(hyperparams['lr']        , list) else [ hyperparams['lr'] ]
 
-    permutation = list(itertools.product(epochs, optimizer, batch_size, fc_dropout, lstm_dropout, lr))
-    permutation = pd.DataFrame(permutation, columns=['epochs', 'optimizer', 'batch_size', 'fc_dropout', 'lstm_dropout', 'lr'])
+    folds_list = folds_sets[ hyperparams['folds_set'] ]
+    if 'folds_numbers' in hyperparams:
+        folds_numbers = hyperparams['folds_numbers'] if isinstance(hyperparams['folds_numbers'], list) else [ hyperparams['folds_numbers'] ]
+        folds_list = [ fold for fold in folds_list if fold['index'] in folds_numbers ]
+    folds_set = hyperparams['folds_set'] if isinstance(hyperparams['folds_set'], list) else [ hyperparams['folds_set'] ]
 
-    return permutation
+    permutation = list(itertools.product(epochs, optimizer, batch_size, fc_dropout, lstm_dropout, lr, folds_set))
+    permutation = pd.DataFrame(permutation, columns=['epochs', 'optimizer', 'batch_size', 'fc_dropout', 'lstm_dropout', 'lr', 'folds_set'])
+
+    return permutation, folds_list
 
 if __name__ == '__main__':
 
@@ -102,7 +108,7 @@ if __name__ == '__main__':
 
     device = torch.device('cuda:' + gpu)
 
-    permutation = parse_hyperparams(args.params)
+    permutation, folds_list = parse_hyperparams(args.params)
 
     for i in range(len(permutation)):
         hyperparams = permutation.iloc[i]
