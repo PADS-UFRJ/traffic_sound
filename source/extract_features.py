@@ -46,6 +46,8 @@ videos_list = const.videos_list
 
 frames_dirs = [ pth.join(const.MT_DATASET_DIR, v) for v in videos_list ] # lista com os diretorios onde estao os frames de cada video
 
+videos_list.extend(const.test_videos_list)
+frames_dirs.extend([ pth.join('/home/matheusnaoto/Traffic-videos/dataset', vid) for vid in const.test_videos_list ])
 
 ## -----------------------------------------------------
 # Inicializacoes

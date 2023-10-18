@@ -23,6 +23,10 @@ videos_list = os.listdir( pth.join(MT_DATASET_DIR, 'raw') )
 videos_list.sort()
 videos_list = [ d.replace('.','') for d in videos_list ] # lista com nomes dos videos
 
+test_videos_list = os.listdir('/home/matheusnaoto/Traffic-videos/dataset/raw-teste/')
+test_videos_list.sort()
+test_videos_list = [ vid.replace('.', '') for vid in test_videos_list ]
+
 ###############################################################################
 
 # Cores bonitas para serem usadas no grafico
