@@ -40,7 +40,7 @@ parser.add_argument('-d', '--date', default='today')
 
 ###############################################################################
 
-def parse_model_config(model_json, hyperparams: dict):
+def parse_model_config(model_json, hyperparams: dict, device: torch.device):
 
     with open(model_json) as json_file:
         model_config = json.load(json_file)
@@ -89,6 +89,8 @@ def parse_hyperparams(hyperparams_json):
     lstm_dropout = hyperparams['lstm_dropout'] if isinstance(hyperparams.get('lstm_dropout'), list) else [ hyperparams.get('lstm_dropout') ] # dropout 0 não dá certo !
     lr         = hyperparams['lr']         if isinstance(hyperparams['lr']        , list) else [ hyperparams['lr'] ]
 
+    if 'folds_set' not in hyperparams:
+        hyperparams['folds_set'] = 'Math Lima'
     folds_list = folds_sets[ hyperparams['folds_set'] ]
     if 'folds_numbers' in hyperparams:
         folds_numbers = hyperparams['folds_numbers'] if isinstance(hyperparams['folds_numbers'], list) else [ hyperparams['folds_numbers'] ]
@@ -121,7 +123,7 @@ if __name__ == '__main__':
         np.random.seed(22)
 
         # Retornando o modelo
-        model_config = parse_model_config(model_json=args.model, hyperparams=hyperparams)
+        model_config = parse_model_config(model_json=args.model, hyperparams=hyperparams, device=device)
 
         model = ModelFromDict(model_config)
         if len(permutation) > 1:
